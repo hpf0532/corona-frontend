@@ -46,6 +46,10 @@
         <router-link to="/register">注册用户</router-link>
       </div>
 
+      <div class="forget-pass">
+        <router-link to="/forget-password">忘记密码</router-link>
+      </div>
+
       <div class="tips">
         <!-- <span style="margin-right:20px;">username: admin</span>
         <span> password: any</span> -->
@@ -240,5 +244,11 @@ $light_gray:#eee;
 }
 .register {
   color: gray;
+  float: left;
+}
+.forget-pass {
+  color: gray;
+  float: left;
+  margin-left: 20px;
 }
 </style>

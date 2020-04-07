@@ -95,6 +95,14 @@ service.interceptors.response.use(
             title: '错误'
           })
           break
+
+          case 403:
+            Notification({
+              message: errData.message,
+              type: 'error',
+              title: '错误'
+            })
+            break
         case 404:
           Router.push({ path: '/error/404' })
           break
@@ -104,6 +112,7 @@ service.interceptors.response.use(
           removeToken()
           resetRouter()
           store.commit('user/RESET_STATE')
+          console.log(Router.currentRoute.fullPath)
           Router.replace({
             path: '/login',
             query: { redirect: Router.currentRoute.fullPath }

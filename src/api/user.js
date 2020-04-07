@@ -45,3 +45,10 @@ export function logout() {
     method: 'post'
   })
 }
+
+export function confirmEmail(params) {
+  return request({
+    url: '/confirm/' + params,
+    method: 'get'
+  })
+}

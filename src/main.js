@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import  qs from 'qs'
 
 // import "bootstrap/dist/css/bootstrap.min.css"
 
@@ -31,6 +32,9 @@ import '@/permission' // permission control
  * Currently MockJs will be used in the production environment,
  * please remove it before going online ! ! !
  */
+
+Vue.prototype.$qs = qs
+
 if (process.env.NODE_ENV === 'production') {
   const { mockXHR } = require('../mock')
   mockXHR()

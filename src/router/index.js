@@ -33,14 +33,40 @@ import Layout from '@/layout'
 export const constantRoutes = [
   {
     path: '/login',
-    component: () => import('@/views/login/index'),
+    name: 'Login',
+    component: () => import('@/views/auth/login'),
     hidden: true
   },
 
   {
     path: '/register',
-    component: () => import('@/views/register/index'),
+    name: 'Register',
+    component: () => import('@/views/auth/register'),
     hidden: true
+  },
+
+  {
+    path: '/forget-password',
+    name: 'ForgetPass',
+    component: () => import('@/views/auth/forget-password'),
+    hidden: true
+
+  },
+
+  {
+    path: '/auth',
+    component: Layout,
+    name: 'Auth',
+    meta: { title: 'Auth', icon: 'example' },
+    hidden: true,
+    children: [
+      {
+        path: 'confirm',
+        name: 'Confirm',
+        component: () => import('@/views/auth/confirm'),
+        meta: { title: 'confirm', noCache: true }
+      },
+    ]
   },
 
   {

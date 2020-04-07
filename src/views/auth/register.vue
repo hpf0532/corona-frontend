@@ -181,7 +181,7 @@ export default {
           this.loading = true
           this.$store.dispatch('user/register', this.registerForm).then(() => {
             Message({
-              message: '注册成功',
+              message: '注册成功, 认证邮件已发送到您的邮箱中, 请登录后激活',
               type: 'success',
               duration: 5 * 1000
             })

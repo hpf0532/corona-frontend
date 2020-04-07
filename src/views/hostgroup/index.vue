@@ -154,6 +154,7 @@ export default {
   },
   created() {
     this.getList()
+    console.log(this.$route.query)
   },
   methods: {
     async getList() {
