@@ -50,7 +50,13 @@ export const constantRoutes = [
     name: 'ForgetPass',
     component: () => import('@/views/auth/forget-password'),
     hidden: true
+  },
 
+  {
+    path: '/reset-password',
+    name: 'ResetPass',
+    component: () => import('@/views/auth/reset-password'),
+    hidden: true
   },
 
   {

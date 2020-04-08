@@ -22,7 +22,7 @@
       </el-form-item>
 
 
-      <!-- <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:10px;" @click.native.prevent="handleLogin">提交</el-button> -->
+      <el-button :loading="loading" type="primary" :disabled="!canClick" style="width:100%;margin-bottom:10px;" @click.native.prevent="handlerForgetPass">{{ content }}</el-button>
 
       <div class="tips">
         <!-- <span style="margin-right:20px;">username: admin</span>
@@ -35,6 +35,7 @@
 
 <script>
 import { validEmail } from '@/utils/validate'
+import { forgetPassword } from '@/api/user'
 
 export default {
   name: 'ForgetPass',
@@ -55,11 +56,52 @@ export default {
         email: [{ required: true, trigger: 'blur', validator: validateEmail }],
       },
       loading: false,
-      redirect: undefined
+      redirect: undefined,
+
+      content: '发送重置密码邮件',
+      totalTime: 60,
+      canClick: true  //添加canClick
     }
   },
-  }
+  
   methods: {
+    handlerForgetPass() {
+      this.$refs.forgetForm.validate(valid => {
+        if (valid) {
+            if (!this.canClick) return   //改动的是这两行代码
+                this.canClick = false
+                this.content = this.totalTime + 's后重新发送'
+                let clock = window.setInterval(() => {
+                  this.totalTime--
+                  this.content = this.totalTime + 's后重新发送'
+                  if (this.totalTime < 0) {
+                    window.clearInterval(clock)
+                    this.content = '重新发送邮件'
+                    this.totalTime = 60
+                    this.canClick = true   //这里重新开启
+                  }
+                },1000)
+          this.loading = true
+          forgetPassword(this.forgetForm).then(response => {
+            const data = response
+            this.$message({
+                showClose: true,
+                message: data.message,
+                type: 'success'
+            })
+            // this.$router.push({path: '/login'})
+            // console.log(data)
+            this.loading = false
+          }).catch((e) => {
+            console.log(e)
+            this.loading = false
+          })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
     // handleLogin() {
     //   this.$refs.forgetForm.validate(valid => {
     //     if (valid) {
@@ -69,6 +111,7 @@ export default {
     //     }
     //   }
     }
+}
 
 </script>
 

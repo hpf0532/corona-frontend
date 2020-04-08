@@ -142,6 +142,14 @@ service.interceptors.response.use(
             })
           })
           break
+
+        case 429:
+          Notification({
+            message: errData.error,
+            type: 'error',
+            title: '错误'
+          })
+          break
         default:
           Notification({
             message: '内部错误',

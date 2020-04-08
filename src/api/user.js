@@ -52,3 +52,20 @@ export function confirmEmail(params) {
     method: 'get'
   })
 }
+
+export function forgetPassword(data) {
+  return request({
+    url: '/forget-password',
+    method: 'post',
+    data
+  })
+}
+
+
+export function resetPassword(token, data) {
+  return request({
+    url: '/reset-password/' + token,
+    method: 'post',
+    data
+  })
+}
