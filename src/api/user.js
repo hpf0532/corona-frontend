@@ -23,6 +23,13 @@ export function getInfo() {
   })
 }
 
+export function getEmailState() {
+  return request({
+    url: '/user/state',
+    method: 'get'
+  })
+}
+
 export function checkUser(data) {
   return request({
     url: '/user/check_user',
@@ -58,6 +65,13 @@ export function forgetPassword(data) {
     url: '/forget-password',
     method: 'post',
     data
+  })
+}
+
+export function resendConfirmEmail() {
+  return request({
+    url: '/resend-confirm-email',
+    method: 'get',
   })
 }
 

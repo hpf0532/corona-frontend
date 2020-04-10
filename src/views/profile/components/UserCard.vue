@@ -19,6 +19,19 @@
 
     <div class="user-bio">
       <div class="user-education user-bio-section">
+        <div class="user-bio-section-header"><svg-icon icon-class="education" /><span>Veryify</span></div>
+        <div class="user-bio-section-body">
+          <div class="text-muted" v-if="isActive">
+              <p style="color:green">邮箱已激活</p>
+          </div>
+          <div class="text-muted" v-else>
+              <p style="color:red">邮箱未激活</p>
+              <el-button :disabled="!canClick" type="primary" @click.native.prevent="handleResend">{{ content }}</el-button>
+          </div>
+        </div>
+      </div>
+
+      <div class="user-education user-bio-section">
         <div class="user-bio-section-header"><svg-icon icon-class="education" /><span>Education</span></div>
         <div class="user-bio-section-body">
           <div class="text-muted">
@@ -54,6 +67,7 @@
 
 <script>
 import PanThumb from '@/components/PanThumb'
+import { getEmailState, resendConfirmEmail } from '@/api/user'
 export default {
   components: { PanThumb },
   props: {
@@ -64,12 +78,61 @@ export default {
           name: '',
           email: '',
           avatar: '',
-          role: 'admin'
+        //   role: 'admin'
         }
       }
     }
+  },
+  data() {
+    return {
+      isActive: false,
+      content: '点击发送激活邮件',
+      totalTime: 60,
+      canClick: true  //添加canClick
+    }
+  },
+  created() {
+    this.getState()
+  },
+  methods: {
+    async getState() {
+      const data  = await getEmailState()
+      this.isActive = data.is_active
+
+    },
+    // 重新发送确认邮箱邮件
+    handleResend() {
+        if (!this.canClick) return   //改动的是这两行代码
+        this.canClick = false
+        this.content = this.totalTime + 's后重新发送'
+        let clock = window.setInterval(() => {
+          this.totalTime--
+          this.content = this.totalTime + 's后重新发送'
+          if (this.totalTime < 0) {
+            window.clearInterval(clock)
+            this.content = '重新发送邮件'
+            this.totalTime = 60
+            this.canClick = true   //这里重新开启
+          }
+        },1000)
+
+        resendConfirmEmail().then(response => {
+            const data = response
+            this.$message({
+                showClose: true,
+                message: data.message,
+                type: 'success'
+            })
+            // this.$router.push({path: '/login'})
+            // console.log(data)
+          }).catch((e) => {
+            console.log(e)
+          })
+        }
+
+    }
   }
-}
+
 </script>
 
 <style lang="scss" scoped>
