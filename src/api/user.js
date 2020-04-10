@@ -23,6 +23,13 @@ export function getInfo() {
   })
 }
 
+export function getTimeLine() {
+  return request({
+    url: '/user/timeline',
+    method: 'get',
+  })
+}
+
 export function getEmailState() {
   return request({
     url: '/user/state',

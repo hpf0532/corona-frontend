@@ -19,7 +19,7 @@
 
     <div class="user-bio">
       <div class="user-education user-bio-section">
-        <div class="user-bio-section-header"><svg-icon icon-class="education" /><span>Veryify</span></div>
+        <div class="user-bio-section-header"><svg-icon icon-class="education" /><span>Verify</span></div>
         <div class="user-bio-section-body">
           <div class="text-muted" v-if="isActive">
               <p style="color:green">邮箱已激活</p>
