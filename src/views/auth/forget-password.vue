@@ -21,6 +21,26 @@
         />
       </el-form-item>
 
+      <el-form-item prop="capcha" style="width:260px;display:inline-block">
+        <span class="svg-container">
+          <svg-icon icon-class="capcha" />
+        </span>
+        <span>
+        <el-input
+          ref="capcha"
+          v-model="forgetForm.capcha"
+          placeholder="验证码"
+          name="capcha"
+          type="text"
+          tabindex="1"
+          auto-complete="on"
+        />
+        </span>
+      </el-form-item>
+      <span style="float:right">
+        <img @click="fetchCapcha" style="margin-top:8px" :src="capchaImg" alt="">
+      </span>
+
 
       <el-button :loading="loading" type="primary" :disabled="!canClick" style="width:100%;margin-bottom:10px;" @click.native.prevent="handlerForgetPass">{{ content }}</el-button>
 
@@ -35,7 +55,7 @@
 
 <script>
 import { validEmail } from '@/utils/validate'
-import { forgetPassword } from '@/api/user'
+import { forgetPassword, getCapcha } from '@/api/user'
 
 export default {
   name: 'ForgetPass',
@@ -48,12 +68,23 @@ export default {
       }
     }
 
+    const validateCapcha = (rule, value, callback) => {
+      if (value.length != 4) {
+        callback(new Error('请输入4位验证码'))
+      } else {
+        callback()
+      }
+    }
     return {
       forgetForm: {
         email: '',
+        capcha:'',
+        capcha_id: ''
       },
+      capchaImg: '',
       forgetRules: {
         email: [{ required: true, trigger: 'blur', validator: validateEmail }],
+        capcha: [{ required: true, trigger: 'blur', validator: validateCapcha }],
       },
       loading: false,
       redirect: undefined,
@@ -63,8 +94,15 @@ export default {
       canClick: true  //添加canClick
     }
   },
-  
+  created() {
+    this.fetchCapcha()
+  },
   methods: {
+    async fetchCapcha(){
+      const data = await getCapcha()
+      this.capchaImg = data.img
+      this.forgetForm.capcha_id = data.img_id
+    },
     handlerForgetPass() {
       this.$refs.forgetForm.validate(valid => {
         if (valid) {
@@ -94,6 +132,7 @@ export default {
             this.loading = false
           }).catch((e) => {
             console.log(e)
+            this.fetchCapcha()
             this.loading = false
           })
         } else {

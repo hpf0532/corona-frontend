@@ -70,6 +70,26 @@
 
       </el-form-item>
 
+      <el-form-item prop="capcha" style="width:260px;display:inline-block">
+        <span class="svg-container">
+          <svg-icon icon-class="capcha" />
+        </span>
+        <span>
+        <el-input
+          ref="capcha"
+          v-model="registerForm.capcha"
+          placeholder="验证码"
+          name="capcha"
+          type="text"
+          tabindex="1"
+          auto-complete="on"
+        />
+        </span>
+      </el-form-item>
+      <span style="float:right">
+        <img @click="fetchCapcha" style="margin-top:8px" :src="capchaImg" alt="">
+      </span>
+
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleRegister">注册</el-button>
 
       <div class="tips">
@@ -84,6 +104,7 @@
 <script>
 import { MessageBox, Message } from 'element-ui'
 import { validEmail, validUserExist, validEmailExist } from '@/utils/validate'
+import { getCapcha } from '@/api/user'
 
 export default {
   name: 'Register',
@@ -139,13 +160,24 @@ export default {
       }
     }
 
+    const validateCapcha = (rule, value, callback) => {
+      if (value.length != 4) {
+        callback(new Error('请输入4位验证码'))
+      } else {
+        callback()
+      }
+    }
+
     return {
       registerForm: {
         username: '',
         email: '',
         password: '',
-        password2: ''
+        password2: '',
+        capcha: '',
+        capcha_id: ''
       },
+      capchaImg: '',
       registerRules: {
         username: [
           { required: true, trigger: 'change', validator: validateUserExist },
@@ -157,7 +189,8 @@ export default {
 
         ],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }],
-        password2: [{ required: true, trigger: 'blur', validator: validatePass2 }]
+        password2: [{ required: true, trigger: 'blur', validator: validatePass2 }],
+        capcha: [{ required: true, trigger: 'blur', validator: validateCapcha }],
 
       },
       loading: false,
@@ -173,7 +206,15 @@ export default {
       immediate: true
     }
   },
+  created() {
+    this.fetchCapcha()
+  },
   methods: {
+    async fetchCapcha(){
+      const data = await getCapcha()
+      this.capchaImg = data.img
+      this.registerForm.capcha_id = data.img_id
+    },
 
     handleRegister() {
       this.$refs.registerForm.validate(valid => {
@@ -189,6 +230,7 @@ export default {
             this.loading = false
           }).catch((e) => {
             console.log(e)
+            this.fetchCapcha()
             this.loading = false
           })
         } else {

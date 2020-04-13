@@ -37,6 +37,13 @@ export function getEmailState() {
   })
 }
 
+export function getCapcha() {
+  return request({
+    url: '/capcha',
+    method: 'get'
+  })
+}
+
 export function checkUser(data) {
   return request({
     url: '/user/check_user',
