@@ -175,6 +175,7 @@ export default {
         const data = await getTaskOptions(this.taskQuery)
         this.taskOptions = data
         console.log(this.taskOptions.items)
+        this.taskForm.options = val
         this.taskOptObj = data.items.reduce((acc, cur) => {
         acc[cur.id] = cur
         return acc
@@ -202,6 +203,7 @@ export default {
         const taskResult = await submitTask({
           hosts: this.taskForm.hosts,
           playbook: this.taskForm.playbook,
+          option: this.taskForm.options,
           extra_vars: this.taskForm.extra_vars
         })
         this.$router.push({name:'TaskDetail', params: {id: taskResult.pk}})

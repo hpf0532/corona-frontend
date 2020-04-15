@@ -4,6 +4,25 @@
       <span class="title-1">Ansible</span>
       <span class="title-2">任务列表</span>
     </div>
+    <div class="filter-container">
+      <el-date-picker
+        style="margin-bottom:10px;vertical-align: middle;"
+        v-model="timeQuery"
+        type="datetimerange"
+        align="right"
+        :picker-options="pickerOptions"
+        value-format="timestamp"
+        start-placeholder="开始日期"
+        end-placeholder="结束日期"
+        :default-time="['12:00:00', '08:00:00']">
+      </el-date-picker>
+      <el-select v-model="listQuery.user" placeholder="操作用户" clearable class="filter-item" style="width: 130px">
+        <el-option v-for="item in userList" :key="item.id" :label="item.name" :value="item.id" />
+      </el-select> 
+      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
+        搜索
+      </el-button>
+    </div>
     <el-table
       v-loading="listLoading"
       :data="list"
@@ -23,7 +42,7 @@
           </span>
         </template>
       </el-table-column>
-      <el-table-column label="执行人" min-width="80px">
+      <el-table-column label="操作人员" min-width="60px">
         <template slot-scope="{row}">
           <span>{{ row.user }}</span>
         </template>
@@ -31,6 +50,11 @@
       <el-table-column label="任务" min-width="100px">
         <template slot-scope="{row}">
           <span>{{ row.playbook }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="任务选项" min-width="80px">
+        <template slot-scope="{row}">
+          <span>{{ row.option }}</span>
         </template>
       </el-table-column>
       <el-table-column label="任务状态" class-name="status-col" width="120">
@@ -59,9 +83,12 @@
 <script>
 import Pagination from '@/components/Pagination'
 import { getTasks } from '@/api/task'
+import { getUsers } from '@/api/user'
 import { parseTime } from '@/utils'
+import waves from '@/directive/waves' // waves directive
 
 export default {
+  directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
@@ -84,23 +111,83 @@ export default {
       list: null,
       listLoading: true,
       total: 0,
+      timeQuery: null,
+      userList: '',
+      userObj: '',
       listQuery: {
         page: 1,
-        limit: 20
-      }
+        limit: 20,
+        user: undefined,
+        startTime: null,
+        endTime: null
+      },
+      pickerOptions: {
+        shortcuts: [{
+          text: '最近一周',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: '最近一个月',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: '最近三个月',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+            picker.$emit('pick', [start, end]);
+          }
+        }]
+      },
     }
   },
   created() {
+    this.getUserName()
     this.getList()
   },
   methods: {
-    async getList() {
-      const taskData = await getTasks(this.listQuery)
-      this.list = taskData.items
-      this.total = taskData.count
-      setTimeout(() => {
-        this.listLoading = false
-      }, 500)
+    getList() {
+      this.listLoading = true
+      getTasks(this.listQuery).then(response => {
+          this.list = response.items
+          this.total = response.count
+          setTimeout(() => {
+            this.listLoading = false
+          }, 500)
+        })
+    },
+    async getUserName() {
+      const data = await getUsers()
+      this.userList = data.items
+      // console.log(this.groupList)
+      this.userObj = this.userList.reduce((acc, cur) => {
+        acc[cur.id] = cur.name
+        return acc
+      }, {})
+    },
+    handleFilter() {
+      this.listQuery.page = 1
+      this.listQuery.startTime = null
+      this.listQuery.endTime = null
+      if(this.timeQuery){
+          const timeStamp = this.timeQuery.map((val) => {
+          return parseInt(val/1000)
+        })
+          this.listQuery.startTime = timeStamp[0]
+          this.listQuery.endTime = timeStamp[1]
+      }
+
+      this.getList()
+
     }
   }
 

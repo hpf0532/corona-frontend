@@ -16,6 +16,13 @@ export function login(data) {
   })
 }
 
+export function getUsers() {
+  return request({
+    url: '/users',
+    method: 'get'
+  })
+}
+
 export function getInfo() {
   return request({
     url: '/user/info',
