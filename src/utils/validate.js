@@ -7,6 +7,7 @@
  * @returns {Boolean}
  */
 import { checkEmail, checkUser } from '@/api/user'
+import { checkFolder } from '@/api/file'
 
 export function isExternal(path) {
   return /^(https?:|mailto:|tel:)/.test(path)
@@ -20,6 +21,18 @@ export function validUserExist(user) {
   const data = { 'username': user }
   return new Promise((resolve, reject) => {
     checkUser(data).then(response => {
+      const { status } = response
+      resolve(status)
+    }).catch(error => {
+      reject(error)
+    })
+  })
+}
+
+export function validFolderExist(folder) {
+  const data = { 'folder_name': folder }
+  return new Promise((resolve, reject) => {
+    checkFolder(data).then(response => {
       const { status } = response
       resolve(status)
     }).catch(error => {
