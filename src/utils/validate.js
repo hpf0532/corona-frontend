@@ -29,8 +29,8 @@ export function validUserExist(user) {
   })
 }
 
-export function validFolderExist(folder) {
-  const data = { 'folder_name': folder }
+export function validFolderExist(folder, pid) {
+  const data = { 'name': folder, 'folder_id': pid }
   return new Promise((resolve, reject) => {
     checkFolder(data).then(response => {
       const { status } = response
