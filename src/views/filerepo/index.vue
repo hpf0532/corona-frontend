@@ -2,12 +2,22 @@
   <div class="app-container">
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <el-button 
-            icon="el-icon-s-home"
-            type="text"
-            @click="changeFolder(null)">
-            文件库
-        </el-button>
+        <span>
+          <el-button 
+              icon="el-icon-s-home"
+              type="text"
+              @click="changeFolder(null)">
+              文件库
+          </el-button>
+        </span>
+        <span v-for="(item, i) in breadcrumbList" :key="item.id">
+          <el-button 
+              icon="el-icon-caret-right"
+              type="text"
+              @click="changeFolder(item.id)">
+              {{ item.name }}
+          </el-button>&nbsp;
+        </span>
         <!-- <span>df</span> -->
         <el-button
           style="float: right; padding:5px 5px; margin-top:8px"
@@ -66,13 +76,17 @@
       >
         <template slot-scope="{row,$index}">
           <!-- @click="handleUpdate(row)" -->
-          <el-button
-            type="text"
-            size="small"
-            icon="el-icon-edit"
-          >
-            编辑
-          </el-button>
+          <span v-if="row.file_type == 2">
+            <el-button
+              type="text"
+              size="small"
+              icon="el-icon-edit"
+              @click="handleUpdate(row)"
+            >
+              编辑
+            </el-button>
+          </span>
+
           <el-button
             type="text"
             size="small"
@@ -97,7 +111,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="createFolder('folderForm')">确 定</el-button>
+        <el-button type="primary" @click="dialogStatus==='create'?createFolder():updateFolder()">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -105,7 +119,7 @@
 
 <script>
 import { validFolderExist } from "@/utils/validate"
-import { getFileList, addFolder } from "@/api/file"
+import { getFileList, addFolder, editFolder } from "@/api/file"
 import { parseTime } from '@/utils'
 
 
@@ -129,6 +143,8 @@ export default {
       listLoading: true,
       dialogStatus: "",
       dialogFormVisible: false,
+      // 导航条
+      breadcrumbList: [],
       textMap: {
         update: "编辑文件夹",
         create: "新建文件夹"
@@ -164,8 +180,20 @@ export default {
         this.$refs["folderForm"].clearValidate();
       })
     },
-    createFolder(formName) {
-      this.$refs[formName].validate(valid => {
+    handleUpdate(row) {
+      // this.$refs.folderForm.resetFields();
+      this.dialogStatus = "update"
+      this.folderForm.id = row.id // copy obj
+      this.folderForm.folderName = row.filename
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        //重置表单
+        // this.$refs.folderForm.resetFields()
+        this.$refs["folderForm"].clearValidate()
+      })
+    },
+    createFolder() {
+      this.$refs["folderForm"].validate(valid => {
         if (valid) {
           console.log(this.fileQuery.folder)
           const formData = { 
@@ -175,9 +203,9 @@ export default {
           console.log(formData)
           addFolder(formData).then((response) => {
             console.log(response)
-            const { id } = response
+            // const { id } = response
             // this.temp.id = id
-            // this.list.unshift(this.temp)
+            this.fileData.unshift(response)
             this.dialogFormVisible = false
             this.$notify({
               title: 'Success',
@@ -192,11 +220,42 @@ export default {
         }
       })
     },
+
+    updateFolder() {
+      this.$refs["folderForm"].validate(valid => {
+        if (valid) {
+          console.log(this.fileQuery.folder)
+          const formData = { 
+            "name": this.folderForm.folderName.trim(),
+            "folder_id": this.fileQuery.folder?this.fileQuery.folder:0
+          }
+          const { id } = this.folderForm
+          console.log(formData)
+          editFolder(id, formData).then((response) => {
+            // const { id } = response
+            // this.temp.id = id
+            const index = this.fileData.findIndex(v => v.id === this.folderForm.id)
+            this.fileData.splice(index, 1, response)
+            this.dialogFormVisible = false
+            this.$notify({
+              title: 'Success',
+              message: '更新成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      })
+    },
     async getFileData() {
       this.listLoading = true
       // 是否有父级目录
       let query = this.fileQuery.folder?this.fileQuery:null
-      const { items, parent_id } = await getFileList(query)
+      const { items, parent_id, breadcrumb_list } = await getFileList(query)
+      this.breadcrumbList = breadcrumb_list
       this.fileData = items
       this.fileQuery.folder = parent_id
       setTimeout(() => {

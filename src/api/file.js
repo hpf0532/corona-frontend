@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function checkFolder(data) {
     return request({
-        url: '/file/check_folder',
+        url: '/filerepo/check_folder',
         method: 'post',
         data
     })
@@ -10,7 +10,7 @@ export function checkFolder(data) {
 
 export function getFileList(params) {
     return request({
-        url: '/files',
+        url: '/filerepo/filelist',
         method: 'get',
         params
     })
@@ -19,8 +19,17 @@ export function getFileList(params) {
 // 创建文件夹
 export function addFolder(data) {
     return request({
-        url: '/files',
+        url: '/filerepo/folder',
         method: 'post',
         data
+    })
+}
+
+// 编辑文件夹
+export function editFolder(id, data) {
+    return request({
+      url: '/filerepo/folder/' + id,
+      method: 'put',
+      data
     })
 }
