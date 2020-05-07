@@ -33,3 +33,20 @@ export function editFolder(id, data) {
       data
     })
 }
+
+export function deleteFile(id) {
+    return request({
+      url: '/filerepo/folder/' + id,
+      method: 'delete'
+    })
+  }
+
+
+// 获取sts token
+export function getSTSToken(data) {
+    return request({
+       url: '/filerepo/sts_token',
+       method: 'post',
+       data
+    })
+}

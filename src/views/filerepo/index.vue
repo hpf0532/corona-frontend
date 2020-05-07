@@ -18,13 +18,31 @@
               {{ item.name }}
           </el-button>&nbsp;
         </span>
-        <!-- <span>df</span> -->
         <el-button
-          style="float: right; padding:5px 5px; margin-top:8px"
+          size="small"
+          style="float: right; padding:6px 6px; margin-top:8px"
           icon="el-icon-circle-plus-outline"
           type="success"
-          @click="handleCreate"
+          @click="handleCreate()"
         >新建文件夹</el-button>
+        <el-upload
+          class="upload-demo"
+          style="float: right"
+          action=""
+          :before-upload="beforeUpload"
+          :show-file-list="false"
+          :on-change="hanldeChange"
+          :http-request="upLoad"
+          :limit="3"
+          multiple
+          :on-exceed="handleExceed"
+          :file-list="fileList">
+          <el-button 
+            style="padding:6px 6px; margin-top:8px; margin-right:3px"
+            icon="el-icon-upload" 
+            size="small" type="primary">上传文件
+          </el-button>
+        </el-upload>
       </div>
       <el-table 
         v-loading="listLoading"
@@ -78,19 +96,18 @@
           <!-- @click="handleUpdate(row)" -->
           <span v-if="row.file_type == 2">
             <el-button
-              type="text"
+              type="primary"
               size="small"
               icon="el-icon-edit"
               @click="handleUpdate(row)"
-            >
-              编辑
-            </el-button>
+            >编辑</el-button>
           </span>
 
           <el-button
-            type="text"
+            type="danger"
             size="small"
             icon="el-icon-delete"
+            @click="handleDelete(row, $index)"
           >删除</el-button>
           <!-- <el-button v-if="row.status!='deleted'" size="mini" type="danger">删除</el-button> -->
         </template>
@@ -119,8 +136,9 @@
 
 <script>
 import { validFolderExist } from "@/utils/validate"
-import { getFileList, addFolder, editFolder } from "@/api/file"
+import { getFileList, addFolder, editFolder, deleteFile, getSTSToken } from "@/api/file"
 import { parseTime } from '@/utils'
+import { client } from '@/utils/oss'
 
 
 export default {
@@ -139,6 +157,8 @@ export default {
       });
     };
     return {
+      dataObj:{},
+      fileList:[],
       fileData: null,
       listLoading: true,
       dialogStatus: "",
@@ -168,6 +188,59 @@ export default {
     this.getFileData()
   },
   methods: {
+    hanldeChange(file, fileList){
+      // console.log(fileList)
+    },
+    handleExceed(files, fileList) {
+        this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+    },
+    beforeUpload(file) {
+        return new Promise((resolve, reject) => {
+        //从后台获取第一步所需的数据
+        //getSTSToken 获取OSS秘钥的接口地址
+        const fileInfo = {"name": file.name, "size": file.size}
+        getSTSToken(fileInfo).then(response => {
+          this.dataObj = response
+          resolve(true)
+        }).catch(err => {
+          console.log(err)
+          reject(false)
+        })
+      })
+    },
+    upLoad(file) {
+      const self = this
+      let files = file.file,
+          point = files.name.lastIndexOf('.'),
+          suffix = files.name.substr(point),
+          fileName = files.name.substr(0, point),
+          date = Date.parse(new Date()),
+          fileNames = `${fileName}_${date}${suffix}`
+      
+      
+      console.log(this.fileList)
+      //fileNames上传文件的名称
+      //file.file上传文件的内容
+      client(this.dataObj).multipartUpload(fileNames, file.file,
+        {
+          progress: function(p) {
+            console.log(p)
+          }
+        }
+      
+      ).then(result => {
+        //下面是如果对返回结果再进行处理，根据项目需要
+        console.log(result)
+        self.$message({
+          message: '上传成功',
+          type: 'success'
+        });
+      }).catch(err => {
+        console.log(err)
+        self.$message.error('上传失败');
+      })
+
+    },
     handleCreate() {
       // this.$refs.folderForm.resetFields();
       this.dialogStatus = "create";
@@ -176,8 +249,8 @@ export default {
       this.dialogFormVisible = true;
       this.$nextTick(() => {
         //重置表单
-        this.$refs.folderForm.resetFields();
-        this.$refs["folderForm"].clearValidate();
+        this.$refs["folderForm"].resetFields()
+        this.$refs["folderForm"].clearValidate()
       })
     },
     handleUpdate(row) {
@@ -192,17 +265,36 @@ export default {
         this.$refs["folderForm"].clearValidate()
       })
     },
+    handleDelete(row, index) {
+        this.$confirm('文件夹包含的所有文件都会被删除?', '是否确定要删除', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+      }).then(() => {
+        deleteFile(row.id).then(data => {
+          this.fileData.splice(index, 1)
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+        }).catch(() => {
+          this.$message.error('删除失败')
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
+    },
     createFolder() {
       this.$refs["folderForm"].validate(valid => {
         if (valid) {
-          console.log(this.fileQuery.folder)
           const formData = { 
             "name": this.folderForm.folderName.trim(),
             "folder_id": this.fileQuery.folder?this.fileQuery.folder:0
           }
-          console.log(formData)
           addFolder(formData).then((response) => {
-            console.log(response)
             // const { id } = response
             // this.temp.id = id
             this.fileData.unshift(response)
@@ -224,13 +316,11 @@ export default {
     updateFolder() {
       this.$refs["folderForm"].validate(valid => {
         if (valid) {
-          console.log(this.fileQuery.folder)
           const formData = { 
             "name": this.folderForm.folderName.trim(),
             "folder_id": this.fileQuery.folder?this.fileQuery.folder:0
           }
           const { id } = this.folderForm
-          console.log(formData)
           editFolder(id, formData).then((response) => {
             // const { id } = response
             // this.temp.id = id
@@ -258,9 +348,10 @@ export default {
       this.breadcrumbList = breadcrumb_list
       this.fileData = items
       this.fileQuery.folder = parent_id
-      setTimeout(() => {
-          this.listLoading = false
-      }, 500)
+      // setTimeout(() => {
+      //     this.listLoading = false
+      // }, 100)
+      this.listLoading = false
       // console.log(data)
     },
     changeFolder(id) {

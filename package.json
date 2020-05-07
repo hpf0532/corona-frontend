@@ -15,6 +15,7 @@
     "svgo": "svgo -f src/icons/svg --config=src/icons/svgo.yml"
   },
   "dependencies": {
+    "ali-oss": "^6.7.0",
     "axios": "0.18.1",
     "bootstrap": "^4.4.1",
     "codemirror": "^5.52.2",
