@@ -306,7 +306,7 @@ export default {
       // setTimeout(function(){ uploadFile() }, Math.round(Math.random()* 1500))
     },
     handleDownload(row) {
-      window.open(row.file_path)
+      location.href = row.download_url
     },
     closeCard() {
       this.showProgress = false
