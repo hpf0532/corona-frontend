@@ -28,15 +28,18 @@
         <el-upload
           class="upload-demo"
           style="float: right"
+          ref='upload'
           action=""
           :before-upload="beforeUpload"
           :show-file-list="false"
           :on-change="hanldeChange"
+          :on-remove="handleRemove"
           :http-request="upLoad"
           :limit="3"
           multiple
           :on-exceed="handleExceed"
-          :file-list="fileList">
+          :file-list="fileList"
+          >
           <el-button 
             style="padding:6px 6px; margin-top:8px; margin-right:3px"
             icon="el-icon-upload" 
@@ -103,6 +106,15 @@
             >编辑</el-button>
           </span>
 
+          <span v-if="row.file_type == 1">
+            <el-button
+              type="primary"
+              size="small"
+              icon="el-icon-download"
+              @click="handleDownload(row)"
+            >下载</el-button>
+          </span>
+
           <el-button
             type="danger"
             size="small"
@@ -131,12 +143,28 @@
         <el-button type="primary" @click="dialogStatus==='create'?createFolder():updateFolder()">确 定</el-button>
       </div>
     </el-dialog>
+
+    <el-card v-if="showProgress" class="progress-card">
+      <div slot="header" class="clear">
+        <i class="el-icon-upload2"></i>
+        <span>上传进度条</span>
+        <el-button style="float: right; padding: 3px 0" type="text" @click="closeCard">关闭</el-button>
+      </div>
+      <div v-for="(val,key,index) in progressObj" :key="key" class="text item">
+        <div style="margin-bottom:10px">
+          <span>{{ key }}</span>
+        </div>
+        
+        <el-progress :text-inside="true" :stroke-width="26" :percentage="val"></el-progress>
+        <br/>
+      </div>
+    </el-card>
   </div>
 </template>
 
 <script>
 import { validFolderExist } from "@/utils/validate"
-import { getFileList, addFolder, editFolder, deleteFile, getSTSToken } from "@/api/file"
+import { getFileList, addFolder, editFolder, deleteFile, getSTSToken, postFile } from "@/api/file"
 import { parseTime } from '@/utils'
 import { client } from '@/utils/oss'
 
@@ -159,9 +187,11 @@ export default {
     return {
       dataObj:{},
       fileList:[],
+      progressObj:{},
       fileData: null,
       listLoading: true,
       dialogStatus: "",
+      showProgress: false,
       dialogFormVisible: false,
       // 导航条
       breadcrumbList: [],
@@ -191,6 +221,9 @@ export default {
     hanldeChange(file, fileList){
       // console.log(fileList)
     },
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+    },
     handleExceed(files, fileList) {
         this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
     },
@@ -209,37 +242,74 @@ export default {
       })
     },
     upLoad(file) {
+      this.progressObj = {}
+      this.$refs.upload.clearFiles()
       const self = this
       let files = file.file,
-          point = files.name.lastIndexOf('.'),
-          suffix = files.name.substr(point),
-          fileName = files.name.substr(0, point),
+          // point = files.name.lastIndexOf('.'),
+          // suffix = files.name.substr(point),
+          // fileName = files.name.substr(0, point),
           date = Date.parse(new Date()),
-          fileNames = `${fileName}_${date}${suffix}`
+          fileNames = `${date}_${files.name}`
+
+      console.log(files)
       
       
-      console.log(this.fileList)
+      // this.progressObj[files.name] = 0
+
       //fileNames上传文件的名称
       //file.file上传文件的内容
-      client(this.dataObj).multipartUpload(fileNames, file.file,
-        {
-          progress: function(p) {
-            console.log(p)
-          }
-        }
-      
-      ).then(result => {
-        //下面是如果对返回结果再进行处理，根据项目需要
-        console.log(result)
-        self.$message({
-          message: '上传成功',
-          type: 'success'
-        });
-      }).catch(err => {
-        console.log(err)
-        self.$message.error('上传失败');
-      })
 
+      setTimeout(
+        () => {
+          client(this.dataObj).multipartUpload(fileNames, file.file,
+            {
+              progress: function(p) {
+                // 显示进度条
+                self.showProgress = true
+                self.progressObj[files.name] = Math.round(p * 100)
+                self.$forceUpdate()
+              }
+            }
+          
+          ).then(result => {
+            //下面是如果对返回结果再进行处理，根据项目需要
+            let etag = result.etag.replace(/\"/g,"")
+            // console.log(result, etag)
+            const file = {
+              "filename": files.name, 
+              "file_size": files.size,
+              "parent_id": this.fileQuery.folder?this.fileQuery.folder:0,
+              "key": fileNames,
+              "etag": etag
+            }
+
+            // setTimeout(
+            //   () => {
+
+            postFile(file).then(response => {
+              this.fileData.unshift(response)
+            })
+            self.$message({
+              message: `文件${files.name}上传成功`,
+              type: 'success'
+            })
+            // Math.round(Math.random()* 4000)
+            // )
+          }).catch(err => {
+            console.log(err)
+            self.$message.error(`文件${files.name}上传失败`);
+          })
+        }, Math.round(Math.random()* 4000)
+      )
+
+      // setTimeout(function(){ uploadFile() }, Math.round(Math.random()* 1500))
+    },
+    handleDownload(row) {
+      window.open(row.file_path)
+    },
+    closeCard() {
+      this.showProgress = false
     },
     handleCreate() {
       // this.$refs.folderForm.resetFields();
@@ -352,7 +422,7 @@ export default {
       //     this.listLoading = false
       // }, 100)
       this.listLoading = false
-      // console.log(data)
+      console.log(this.fileData)
     },
     changeFolder(id) {
       this.fileQuery.folder = id
@@ -364,4 +434,18 @@ export default {
 </script>
 
 <style scoped>
+.clear:before,
+.clear:after {
+  display: table;
+  content: "";
+}
+.clear:after {
+  clear: both
+}
+.progress-card {
+  width: 480px;
+  position: fixed;
+  right: 15px;
+  bottom: 15px;
+}
 </style>

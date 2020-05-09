@@ -50,3 +50,12 @@ export function getSTSToken(data) {
        data
     })
 }
+
+// 文件上传后结果回传后台
+export function postFile(data) {
+    return request({
+       url: '/filerepo/file_post',
+       method: 'post',
+       data
+    })
+}

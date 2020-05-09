@@ -316,7 +316,7 @@ export const constantRoutes = [
     },
     children: [
       {
-        path: 'http://192.168.3.225:8080',
+        path: 'http://10.0.0.225:8080',
         meta: { title: 'Jenkins', icon: 'jenkins' }
       },
       {
