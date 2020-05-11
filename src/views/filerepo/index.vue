@@ -85,7 +85,7 @@
         <el-table-column label="文件大小" width="250">
           <template slot-scope="{row}">
             <div v-if="row.file_type == 1">
-              {{ row.file_size }}
+              {{ row.file_size | convertBytes }}
             </div>
             <div v-else>
               -
@@ -179,6 +179,7 @@ import { validFolderExist } from "@/utils/validate"
 import { createBucket, getFileList, addFolder, editFolder, deleteFile, getSTSToken, postFile } from "@/api/file"
 import { parseTime } from '@/utils'
 import { client } from '@/utils/oss'
+import { convertBytes } from '@/filters'
 
 
 export default {

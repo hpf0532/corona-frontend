@@ -66,3 +66,21 @@ export function toThousandFilter(num) {
 export function uppercaseFirst(string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
 }
+
+/**
+ * Convert Bytes 
+ * ex: 1024 -> 1KB
+ */
+export function convertBytes(num) {
+  if(num < 1024) {
+    return num.toString() + ' B'
+  }else if(num >= 1024 && num < 1024 * 1024) {
+    return (num/1024).toFixed(2).toString() + ' KB'
+  }else if(num >= 1024 * 1024 && num < 1024 * 1024 * 1024) {
+    return (num/(1024*1024)).toFixed(2).toString() + ' MB'  
+  }else if(num >= 1024 * 1024 * 1024 && num <= 1024 * 1024 * 1024 * 1024) {
+    return (num/(1024*1024*1024)).toFixed(2).toString() + ' GB'  
+  }else {
+    return (num/(1024*1024*1024*1024)).toFixed(2).toString() + ' TB'
+  }
+}
