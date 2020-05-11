@@ -59,3 +59,11 @@ export function postFile(data) {
        data
     })
 }
+
+// 创建bucket接口
+export function createBucket() {
+    return request({
+        url: '/filerepo/add_bucket',
+        method: 'get'
+    })
+}

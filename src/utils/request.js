@@ -97,10 +97,10 @@ service.interceptors.response.use(
           break
 
           case 403:
-            Notification({
+            Message({
               message: errData.message,
               type: 'error',
-              title: '错误'
+              duration: 3 * 1000
             })
             break
         case 404:

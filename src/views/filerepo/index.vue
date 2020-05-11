@@ -18,6 +18,7 @@
               {{ item.name }}
           </el-button>&nbsp;
         </span>
+        <span v-if="bucket">
         <el-button
           size="small"
           style="float: right; padding:6px 6px; margin-top:8px"
@@ -46,6 +47,17 @@
             size="small" type="primary">上传文件
           </el-button>
         </el-upload>
+        </span>
+        <span v-else>
+          <el-button 
+            style="float: right; padding:6px 6px; margin-top:8px; margin-right:3px"
+            icon="el-icon-folder" 
+            size="small" 
+            type="primary"
+            @click="addBucket"
+            >开通网盘功能
+          </el-button>
+        </span>
       </div>
       <el-table 
         v-loading="listLoading"
@@ -164,7 +176,7 @@
 
 <script>
 import { validFolderExist } from "@/utils/validate"
-import { getFileList, addFolder, editFolder, deleteFile, getSTSToken, postFile } from "@/api/file"
+import { createBucket, getFileList, addFolder, editFolder, deleteFile, getSTSToken, postFile } from "@/api/file"
 import { parseTime } from '@/utils'
 import { client } from '@/utils/oss'
 
@@ -185,6 +197,7 @@ export default {
       });
     };
     return {
+      bucket: null,
       dataObj:{},
       fileList:[],
       progressObj:{},
@@ -414,20 +427,25 @@ export default {
       this.listLoading = true
       // 是否有父级目录
       let query = this.fileQuery.folder?this.fileQuery:null
-      const { items, parent_id, breadcrumb_list } = await getFileList(query)
+      const { items, parent_id, breadcrumb_list, bucket } = await getFileList(query)
       this.breadcrumbList = breadcrumb_list
       this.fileData = items
       this.fileQuery.folder = parent_id
+      this.bucket = bucket
       // setTimeout(() => {
       //     this.listLoading = false
       // }, 100)
       this.listLoading = false
-      console.log(this.fileData)
     },
     changeFolder(id) {
       this.fileQuery.folder = id
       this.getFileData()
 
+    },
+    addBucket() {
+      createBucket().then(response => {
+        this.bucket = response.bucket
+      })
     }
   }
 }

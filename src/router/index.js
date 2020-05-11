@@ -241,12 +241,12 @@ export const constantRoutes = [
   {
     path: '/file',
     component: Layout,
-    redirect: '/file/list',
+    // redirect: '/file/list',
     name: 'File',
-    meta: {
-      title: '文件模块',
-      icon: 'file'
-    },
+    // meta: {
+    //   title: '文件模块',
+    //   icon: 'file'
+    // },
     children: [
       {
         path: 'list',
