@@ -186,7 +186,7 @@ export default {
         playbook: '',
         env: '',
         content: '',
-        url: ''
+        url: null
       },
       rules: {
         name: [{ required: true, message: '参数名必填', trigger: 'change' }],
@@ -210,8 +210,6 @@ export default {
         // console.log(response)
         this.list = response.items
         this.total = response.count
-        console.log(this.list)
-        console.log(this.total)
         // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
@@ -226,8 +224,6 @@ export default {
         acc[cur.id] = cur.name
         return acc
       }, {})
-      console.log("play")
-      console.log(this.playbooksObj)
     },
     async getEnvName() {
       const data = await getEnvs()
@@ -263,7 +259,7 @@ export default {
         playbook: '',
         env: '',
         content: null,
-        url: ''
+        url: null
       }
     },
     handleCreate() {
@@ -276,7 +272,11 @@ export default {
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
-      this.temp.content = JSON.parse(row.content)
+      console.log("handle")
+      console.log(typeof(this.temp.content))
+      console.log(this.temp.content)
+      // this.temp.content = JSON.parse(row.content)
+      // this.temp.content = row.content
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -287,6 +287,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const { id, name, playbook, env, content, url } = this.temp
+
           if(!env) {
             var createData = {
               name: name.trim(),
@@ -303,9 +304,6 @@ export default {
               url: url
             }
           }
-
-
-          console.log(createData)
 
           createOptions(createData).then((response) => {
             const { id } = response
@@ -325,29 +323,32 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          const tempData = Object.assign({}, this.temp)
-          const { id, name, playbook, env, content, url } = tempData
-          console.log(this.temp)
+          let { id, name, playbook, env, content, url } = this.temp
 
+          try {
+            var content_json = JSON.parse(content)
+          } catch(e) {
+            content_json = content
+          }
           if(!env) {
             var editData = {
               name: name.trim(),
               playbook_id: playbook,
-              content: JSON.parse(content),
-              url: url
+              content: content_json,
+              url: url,
             }
           }else{
             editData = {
               name: name.trim(),
               playbook_id: playbook,
               env_id: env,
-              content: JSON.parse(content),
-              url: url
+              url: url,
+              content: content_json,
             }
           }
-          updateOptions(id, editData).then(() => {
+          updateOptions(id, editData).then((response) => {
             const index = this.list.findIndex(v => v.id === this.temp.id)
-            this.list.splice(index, 1, this.temp)
+            this.list.splice(index, 1, response)
             this.dialogFormVisible = false
             this.$notify({
               title: 'Success',
