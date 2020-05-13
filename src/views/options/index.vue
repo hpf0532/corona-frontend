@@ -35,11 +35,11 @@
       @sort-change="sortChange"
     >
       <el-table-column label="序号" type="index" width="100" />
-      <el-table-column label="ID" prop="id" sortable="custom" align="center" width="80">
+      <!-- <el-table-column label="ID" prop="id" sortable="custom" align="center" width="80">
         <template slot-scope="{row}">
           <span>{{ row.id }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column label="配置名称" min-width="150px" align="center">
         <template slot-scope="{row}">
           <span class="link-type">{{ row.name }}</span>
@@ -53,6 +53,11 @@
       <el-table-column label="环境信息" min-width="130px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.env | envFilter }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="项目url" min-width="200px" align="center">
+        <template slot-scope="{row}">
+          <el-link :href="row.url" target="_blank">{{ row.url }}</el-link>
         </template>
       </el-table-column>
       <el-table-column
@@ -94,6 +99,9 @@
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="85px" style="width: 800px; margin-left:50px;">
         <el-form-item label="配置名称" prop="name">
           <el-input v-model="temp.name" />
+        </el-form-item>
+        <el-form-item label="项目地址" prop="url">
+          <el-input v-model="temp.url" />
         </el-form-item>
         <el-form-item label="playbook" prop="playbook">
           <el-select v-model="temp.playbook" clearable class="filter-item" placeholder="请选择">
@@ -177,7 +185,8 @@ export default {
         name: '',
         playbook: '',
         env: '',
-        content: ''
+        content: '',
+        url: ''
       },
       rules: {
         name: [{ required: true, message: '参数名必填', trigger: 'change' }],
@@ -253,7 +262,8 @@ export default {
         name: '',
         playbook: '',
         env: '',
-        content: null
+        content: null,
+        url: ''
       }
     },
     handleCreate() {
@@ -276,19 +286,21 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          const { id, name, playbook, env, content } = this.temp
+          const { id, name, playbook, env, content, url } = this.temp
           if(!env) {
             var createData = {
               name: name.trim(),
               playbook_id: playbook,
-              content: JSON.parse(content)
+              content: JSON.parse(content),
+              url: url
             }
           }else{
             createData = {
               name: name.trim(),
               playbook_id: playbook,
               env_id: env,
-              content: JSON.parse(content)
+              content: JSON.parse(content),
+              url: url
             }
           }
 
@@ -314,20 +326,23 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          const { id, name, playbook, env, content } = tempData
+          const { id, name, playbook, env, content, url } = tempData
+          console.log(this.temp)
 
           if(!env) {
             var editData = {
               name: name.trim(),
               playbook_id: playbook,
-              content: JSON.parse(content)
+              content: JSON.parse(content),
+              url: url
             }
           }else{
             editData = {
               name: name.trim(),
               playbook_id: playbook,
               env_id: env,
-              content: JSON.parse(content)
+              content: JSON.parse(content),
+              url: url
             }
           }
           updateOptions(id, editData).then(() => {
