@@ -257,7 +257,7 @@ export default {
         id: '',
         name: '',
         playbook: '',
-        env: '',
+        env: null,
         content: null,
         url: null
       }
@@ -272,11 +272,6 @@ export default {
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
-      console.log("handle")
-      console.log(typeof(this.temp.content))
-      console.log(this.temp.content)
-      // this.temp.content = JSON.parse(row.content)
-      // this.temp.content = row.content
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -288,23 +283,16 @@ export default {
         if (valid) {
           const { id, name, playbook, env, content, url } = this.temp
 
-          if(!env) {
-            var createData = {
-              name: name.trim(),
-              playbook_id: playbook,
-              content: JSON.parse(content),
-              url: url
+          const createData = {
+            name: name.trim(),
+            playbook_id: playbook,
+            env_id: env?env:null,
+            content: JSON.parse(content),
+            url: url?url:null
             }
-          }else{
-            createData = {
-              name: name.trim(),
-              playbook_id: playbook,
-              env_id: env,
-              content: JSON.parse(content),
-              url: url
-            }
-          }
+          
 
+          console.log(createData)
           createOptions(createData).then((response) => {
             const { id } = response
             this.temp.id = id
@@ -330,22 +318,15 @@ export default {
           } catch(e) {
             content_json = content
           }
-          if(!env) {
-            var editData = {
-              name: name.trim(),
-              playbook_id: playbook,
-              content: content_json,
-              url: url,
-            }
-          }else{
-            editData = {
-              name: name.trim(),
-              playbook_id: playbook,
-              env_id: env,
-              url: url,
-              content: content_json,
-            }
+
+          var editData = {
+            name: name.trim(),
+            playbook_id: playbook,
+            env_id: env?env:null,
+            url: url?url:null,
+            content: content_json,
           }
+          
           updateOptions(id, editData).then((response) => {
             const index = this.list.findIndex(v => v.id === this.temp.id)
             this.list.splice(index, 1, response)
