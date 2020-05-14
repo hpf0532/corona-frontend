@@ -181,7 +181,7 @@ export default {
         return acc
       }, {})
 
-        this.taskForm.extra_vars = JSON.parse(this.taskOptObj[val].content)
+        this.taskForm.extra_vars = this.taskOptObj[val].content
       },
       async handleSubmit() {
         console.log(this.taskForm)
