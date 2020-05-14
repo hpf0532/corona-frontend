@@ -16,6 +16,7 @@
         end-placeholder="结束日期"
         :default-time="['12:00:00', '08:00:00']">
       </el-date-picker>
+      <el-input v-model="listQuery.ansibleId" clearable placeholder="Ansible ID" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-select v-model="listQuery.user" placeholder="操作用户" clearable class="filter-item" style="width: 130px">
         <el-option v-for="item in userList" :key="item.id" :label="item.name" :value="item.id" />
       </el-select> 
@@ -117,6 +118,7 @@ export default {
       listQuery: {
         page: 1,
         limit: 20,
+        ansibleId: undefined,
         user: undefined,
         startTime: null,
         endTime: null
