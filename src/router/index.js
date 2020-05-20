@@ -242,6 +242,7 @@ export const constantRoutes = [
     path: '/wiki',
     component: Layout,
     name: 'Wiki',
+    hidden: true,
     children: [
       {
         path: 'list',
