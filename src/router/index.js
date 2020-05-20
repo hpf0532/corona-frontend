@@ -239,6 +239,21 @@ export const constantRoutes = [
   },
 
   {
+    path: '/wiki',
+    component: Layout,
+    name: 'Wiki',
+    children: [
+      {
+        path: 'list',
+        name: 'WikiList',
+        component: () => import('@/views/wiki/index'),
+        meta: { title: 'wiki', icon: 'wiki' }
+
+      },
+    ]
+  },
+
+  {
     path: '/file',
     component: Layout,
     // redirect: '/file/list',
