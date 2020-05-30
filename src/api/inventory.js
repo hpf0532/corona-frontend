@@ -64,7 +64,7 @@ export function getPlayBooks() {
 
 export function getPlayBookDetail(id) {
   return request({
-    url: 'playbooks/' + id,
+    url: '/playbooks/' + id,
     method: 'get'
   })
 }

@@ -133,6 +133,7 @@ export default {
           }).catch((e) => {
             console.log(e)
             this.fetchCapcha()
+            this.loginForm.capcha = ''
             this.loading = false
           })
         } else {

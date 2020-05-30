@@ -1,10 +1,10 @@
 <template>
   <div class="app-container">
     <div class="table-title">
-      <span class="title-1">Ansible</span>
-      <span class="title-2">playbook列表</span>
+      <span class="title-1">wiki</span>
+      <span class="title-2">分类列表</span>
     </div>
-    <div class="playbook-title">
+    <div class="group-title">
       <el-button
         type="success"
         size="small"
@@ -14,6 +14,7 @@
       </el-button>
     </div>
     <div>
+
       <el-table v-loading="listLoading" :data="list" :cell-style="{'vertical-align':'middle'}" border fit highlight-current-row style="width: 100%">
         <el-table-column
           label="ID"
@@ -22,59 +23,26 @@
         />
 
         <el-table-column label="Name">
-          <template slot-scope="{row}">
-
-            <template v-if="row.create">
+          <template slot-scope="{row, $index}">
+            <template v-if="row.edit">
               <el-input v-model="row.name" class="edit-input" size="small" />
             </template>
-            <span v-else>
-              <router-link :to="'/inventory/playbook/detail/'+row.id" class="link-type">
-                {{ row.name }}
-              </router-link>
-            </span>
+            <span v-else>{{ row.name }}</span>
           </template>
-
         </el-table-column>
-
-        <el-table-column label="Author">
+        <el-table-column label="Posts">
           <template slot-scope="{row}">
-            <template v-if="row.edit">
-              <el-input v-model="row.author" class="edit-input" size="small" />
-            </template>
-            <span v-else>{{ row.author }}</span>
+            <span>{{ row.posts }}</span>
           </template>
         </el-table-column>
-
-        <el-table-column label="Information">
-          <template slot-scope="{row}">
-            <template v-if="row.edit">
-              <el-input v-model="row.information" class="edit-input" size="small" />
-            </template>
-            <span v-else>{{ row.information }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="Is_env">
-          <template slot-scope="{row}">
-            <template v-if="row.edit">
-              <el-radio-group v-model="row.is_env">
-                <el-radio :label="true">是</el-radio>
-                <el-radio :label="false">否</el-radio>
-              </el-radio-group>
-            </template>
-            <span v-else>{{ row.is_env }}</span>
-          </template>
-        </el-table-column>
-
         <el-table-column label="Actions">
-
-          <template slot-scope="{row}">
+          <template slot-scope="{row, $index}">
             <el-button
               v-if="row.edit"
               type="success"
               size="small"
               icon="el-icon-circle-check-outline"
-              @click.native.prevent="confirmEdit(row)"
+              @click.native.prevent="confirmEdit(row, $index)"
             >
               保存
             </el-button>
@@ -88,7 +56,7 @@
               取消
             </el-button>
             <el-button
-              v-else
+              v-if="!row.edit  && row.name != 'Default'"
               type="primary"
               size="small"
               icon="el-icon-edit"
@@ -97,7 +65,7 @@
               编辑
             </el-button>
             <el-button
-              v-if="!row.edit"
+              v-if="!row.edit  && row.name != 'Default'"
               type="danger"
               size="small"
               icon="el-icon-delete"
@@ -107,18 +75,16 @@
             </el-button>
           </template>
         </el-table-column>
-        <!-- </el-form-item> -->
-
       </el-table>
-      <!-- </el-form> -->
     </div>
   </div>
 </template>
 
 <script>
-import { getPlayBooks, createPlayBook, deletePlayBook, editPlayBook } from '@/api/inventory'
+import { mapGetters } from 'vuex'
+import { createCategory, editCategory, deleteCategory, getCategorys } from '@/api/wiki'
 export default {
-  name: 'InlineEditTable',
+  name: 'CategoryList',
   filters: {
     statusFilter(status) {
       const statusMap = {
@@ -134,7 +100,7 @@ export default {
       newItem: null,
       item: null,
       list: null,
-      listLoading: true,
+      listLoading: false,
       listQuery: {
         page: 1,
         limit: 10
@@ -142,47 +108,42 @@ export default {
     }
   },
   created() {
-    this.getList()
+    this.getCategoryList()
+    console.log(this.$route.query)
+  },
+  computed: {
+    ...mapGetters([
+    'categoryList',
+    ]),
+    // categoryList() {
+    //   return this.$store.state.wiki.categoryList.map(v => {
+    //     this.$set(v, 'edit', false)
+    //     v.originalName = v.name 
+    //     return v
+    //   })
+    // }
   },
   methods: {
-    async getList() {
+    async getCategoryList() {
       this.listLoading = true
-      const data = await getPlayBooks()
+      const data = await getCategorys()
       const items = data.items
       this.list = items.map(v => {
         this.$set(v, 'edit', false) // https://vuejs.org/v2/guide/reactivity.html
-        this.$set(v, 'create', false)
         v.originalName = v.name //  will be used when user click the cancel botton
-        v.originalAuthor = v.author
-        v.originalInfo = v.information
-        v.originalIsenv = v.is_env
         return v
       })
       this.listLoading = false
     },
     createItem() {
-      this.item = {
-        id: '',
-        name: '',
-        author: '',
-        information: '',
-        is_env: false,
-        originalName: '',
-        originalAuthor: '',
-        originalInfo: '',
-        originalIsenv: ''
-      }
-      console.log(this.item)
-      this.$set(this.item, 'create', true)
+      console.log(this.categoryList)
+      this.item = { id: '', name: '', originalName: '' }
       this.$set(this.item, 'edit', true)
-
       this.list.push(this.item)
     },
+
     cancelEdit(row) {
       row.name = row.originalName
-      row.author = row.originalAuthor
-      row.information = row.originalInfo
-      row.is_env = row.originalIsenv
       row.edit = false
       this.$message({
         message: '取消编辑',
@@ -196,7 +157,7 @@ export default {
           cancelButtonText: '取消',
           type: 'error'
         }).then(() => {
-          deletePlayBook(row.id).then(data => {
+          deleteCategory(row.id).then(data => {
             this.list = this.list.filter(({ id }) => id !== row.id)
             this.$message({
               type: 'success',
@@ -215,63 +176,30 @@ export default {
         this.list = this.list.filter(({ id }) => id !== row.id)
       }
     },
-    async confirmEdit(row) {
+    async confirmEdit(row, index) {
+      console.log(row)
       if (row.name.trim() === '') {
         this.$notify({
-          message: 'playbook不能为空',
-          type: 'error',
-          title: '错误'
-        })
-        return
-      }
-      if (row.author.trim() === '') {
-        this.$notify({
-          message: '作者不能为空',
-          type: 'error',
-          title: '错误'
-        })
-        return
-      }
-      if (row.information.trim() === '') {
-        this.$notify({
-          message: 'information不能为空',
+          message: '分类名不能为空',
           type: 'error',
           title: '错误'
         })
         return
       }
 
-      const { id, name, author, information, is_env } = row
-      // console.log(name, description )
-      // row.validate()
+      const { id, name } = row
 
       if (!row.id) {
-        this.newItem = await createPlayBook({
-          name: name.trim(),
-          author: author.trim(),
-          information: information.trim(),
-          is_env: is_env
-        })
+        this.newItem = await createCategory({ name: name.trim() })
+        // this.$store.dispatch('wiki/addCategory', { name: name.trim() })
         row.id = this.newItem.id
-        // console.log(this.newItem)
       } else {
-        this.newItem = await editPlayBook(
-          row.id,
-          {
-            name: name.trim(),
-            author: author.trim(),
-            information: information.trim(),
-            is_env: is_env
-          }
-        )
+        // this.$store.dispatch('wiki/changeCategory', { index: index, id: row.id, name: name.trim() })
+        this.newItem = await editCategory(row.id, { name: name.trim() })
       }
 
       row.edit = false
-      row.create = false
       row.originalName = row.name
-      row.originalAuthor = row.author
-      row.originalInfo = row.infomation
-      row.originalIsenv = row.is_env
       this.$message({
         message: '已保存',
         type: 'success'
@@ -290,17 +218,7 @@ export default {
   right: 15px;
   top: 10px;
 }
-.playbook-title {
+.group-title {
   margin-bottom: 10px;
 }
-
-.link-type,
-.link-type:focus {
-  color: #337ab7;
-  cursor: pointer;
-}
-.link-type:hover {
-  color: rgb(32, 160, 255);
-}
-
 </style>

@@ -240,15 +240,46 @@ export const constantRoutes = [
 
   {
     path: '/wiki',
-    component: Layout,
     name: 'Wiki',
-    hidden: true,
+    redirect: '/wiki/posts',
+    component: Layout,
+    meta: { title: 'wiki', icon: 'wiki' },
     children: [
       {
-        path: 'list',
-        name: 'WikiList',
+        path: 'posts',
+        name: 'WikiContent',
+        redirect: "/wiki/posts/list",
         component: () => import('@/views/wiki/index'),
-        meta: { title: 'wiki', icon: 'wiki' }
+        // meta: { title: '文章首页' },
+        children: [
+          {
+            path: 'list',
+            name: 'WikiList',
+            component: () => import('@/views/wiki/list'),
+            meta: { title: '文章列表', icon: 'post' }
+          },
+          {
+            path: 'edit',
+            name: 'Edit',
+            component: () => import('@/views/wiki/create'),
+            meta: { title: '编辑文章' },
+            hidden: true
+          },
+          {
+            path: 'detail/:id(\\d+)',
+            component: () => import('@/views/wiki/detail'),
+            name: 'DocDetail',
+            meta: { title: '文档正文' },
+            hidden: true
+          }
+        ]
+
+      },
+      {
+        path: 'category',
+        name: 'Category',
+        component: () => import('@/views/wiki/category'),
+        meta: { title: '文章分类', icon: 'category' }
 
       },
     ]

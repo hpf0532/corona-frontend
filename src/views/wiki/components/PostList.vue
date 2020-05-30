@@ -1,8 +1,156 @@
 <template>
-    
+    <div class="post-list">
+        <div v-if="postList.count">
+        <div v-for="item in postList.items" class="post-container">
+            <div class="user-block">
+                <img class="img-circle" :src="item.avatar+avatarPrefix">
+                <span class="username text-muted">{{ item.author }}</span>
+                <span class="description">发布于: {{ item.create_time | parseTime('{y}-{m}-{d}') }}</span>
+            </div>
+            <div class="post">
+                <div class="title">
+                    <router-link :to="'/wiki/posts/detail/'+item.id" class="link-type">
+                        <h2>{{ item.title }}</h2>
+                    </router-link>
+                </div>
+                <div class="summary">
+                    <p>{{ item.desc }}</p>
+                </div>
+            </div>
+            <hr>
+        </div>
+        </div>
+        <div class="none-post" v-else>
+            还没有文章哦 
+            <router-link class="link-create" to="/wiki/posts/edit">
+                动手写一篇
+            </router-link>
+        </div>
+        <pagination
+        v-show="total>0"
+        :total="total"
+        :page.sync="filterQuery.page"
+        :limit.sync="filterQuery.limit"
+        @pagination="fetchPosts"
+        />
+    </div>
 </template>
 <script>
+const avatarPrefix = '?imageView2/1/w/80/h/80'
+import { mapGetters } from 'vuex'
+import { parseTime } from '@/utils'
+import Pagination from '@/components/Pagination'
+export default {
+    components: { Pagination },
+    props: {
+        query: {
+        type: Object,
+        default: () => {
+            return {
+                page: 1,
+                limit: 20,
+            }
+        }
+        }
+    },
+    data() {
+        return {
+            avatarPrefix
+        }
+    },
+    computed: {
+        ...mapGetters([
+        'postList',
+        'total',
+        'filterQuery'
+        ]),
+    },
+    created() {
+    },
+    watch: {
+        filterQuery: {
+            handler(newName, oldName){
+                console.log("watch")
+                this.fetchPosts()
+            },
+            immediate: true,
+            deep: true
+        }
+    },
+    methods: {
+        fetchPosts() {
+            this.$store.dispatch('wiki/getPosts', this.filterQuery).then(response => {
+                console.log('aaaaaaaaaaaaaaaaaaa')
+                console.log(this.filterQuery)
+                // console.log(this.postList)
+                // console.log(this.total)
+                // this.total = this.postList.count
+            }).catch(e => {
+                console.log(e)
+            })
+        }
+    }
+}
 </script>
 <style lang="scss" scoped>
+  hr {
+      height: 2px;
+      border: none;
+      border-top:2px solid #EEEEEE;
+  }
+  .user-block {
+    .username,
+    .description {
+      display: block;
+      margin-left: 50px;
+      padding: 2px 0;
+    }
+    .username{
+      font-size: 16px;
+      color: #000;
 
+    }
+    :after {
+      clear: both;
+    }
+    .img-circle {
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      float: left;
+    }
+    span {
+      font-weight: 500;
+      font-size: 12px;
+    }
+  }
+.post-container {
+    margin-bottom: 10px;;
+}
+.post {
+    margin: 10px 0px 10px 0px;
+    .link-type,
+    .link-type:focus {
+        color: black;
+        cursor: pointer;
+    }
+    .link-type:hover {
+        color: rgb(32, 160, 255);
+    }
+    .summary {
+        line-height: 1.5;
+    }
+}
+.none-post {
+    background-color: #FAFBFC;
+    font-size: 16px;
+    height: 200px;
+    text-align: center;
+    line-height: 200px;
+    font-family: inherit;
+    color: #909399;
+    .link-create {
+        color: #2780E3;
+    }
+}
 </style>>
