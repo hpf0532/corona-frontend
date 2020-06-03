@@ -153,6 +153,7 @@ export default {
       this.html = this.$refs.markdownEditor.getHtml()
       const data = {title: this.postForm.title, body:this.html, category_id: this.categroy }
       saveDraft(query, data).then(res => {
+            this.id = res.id
             this.$message({
               message: '已保存',
               type: 'success',

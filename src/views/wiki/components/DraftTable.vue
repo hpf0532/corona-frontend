@@ -38,13 +38,13 @@
   </el-table>
   <div style="margin-top: 20px">
     <el-button @click="toggleSelect(draftList)">全选/取消</el-button>
-    <el-button type="primary" @click="toggleSelection()">删除</el-button>
+    <el-button type="primary" @click="batchDelete()">删除</el-button>
   </div>
         
     </div>
 </template>
 <script>
-import { getDrafts, deleteDraft } from "@/api/wiki"
+import { getDrafts, deleteDraft, batchDeleteDraft } from "@/api/wiki"
 import { parseTime } from '@/utils'
 
 export default {
@@ -83,7 +83,41 @@ export default {
     },
 
     handleSelectionChange(val) {
-    this.multipleSelection = val;
+      console.log(val)
+      this.multipleSelection = []
+      val.forEach(item => {
+        this.multipleSelection.push(item.id)
+      })
+    },
+    
+    async batchDelete() {
+      if(this.multipleSelection.length === 0) {
+          this.$message({
+            type: 'error',
+            message: '请选择草稿'
+          })
+          return false
+      }
+      await this.$confirm('确认删除这些文章?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'error'
+      }).then(() => {
+        batchDeleteDraft(this.multipleSelection).then(data => {
+          this.draftList = data.items
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+        }).catch(() => {
+          this.$message.error('删除失败')
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
     },
 
     editDraft(row) {

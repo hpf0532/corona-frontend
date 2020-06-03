@@ -300,7 +300,7 @@ export const constantRoutes = [
       {
         path: 'draft-box',
         component: () => import('@/views/wiki/draft-box'),
-        name: 'Draft',
+        name: 'DraftBox',
         meta: { title: '草稿箱', icon: 'draft' },
       },
       {

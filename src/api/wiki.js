@@ -103,3 +103,12 @@ export function saveDraft(params, data) {
     data
   })
 }
+
+// 批量删除草稿接口
+export function batchDeleteDraft(data) {
+  return request({
+    url: '/delete-drafts',
+    method: 'post',
+    data
+  })
+}
