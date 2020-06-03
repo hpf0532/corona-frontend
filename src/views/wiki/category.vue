@@ -137,7 +137,7 @@ export default {
     },
     createItem() {
       console.log(this.categoryList)
-      this.item = { id: '', name: '', originalName: '' }
+      this.item = { id: '', name: '', originalName: '', posts: 0 }
       this.$set(this.item, 'edit', true)
       this.list.push(this.item)
     },

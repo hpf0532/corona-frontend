@@ -4,8 +4,8 @@
             <el-form ref="postForm" :model="postForm" :rules="rules" class="form-container">
                 <el-row>
                     <el-col :span="16">
-                        <el-form-item label="标题" prop="title">
-                            <el-input class="title" size="big" v-model="postForm.title" placeholder="请输入标题, 您可以输入50字"></el-input>
+                        <el-form-item class="title" label="标题" prop="title">
+                            <el-input size="big" v-model="postForm.title" placeholder="请输入标题, 您可以输入50字"></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -36,7 +36,7 @@
                 <el-row style="height:50px">
                   <el-card class="box-card">
                     <el-button type="primary" class="deploy" @click="submitForm">发布文章</el-button>
-                    <el-button type="info" class="deploy">保存草稿</el-button>
+                    <el-button v-if="isDraft" type="info" class="deploy" @click="handleSave()">保存草稿</el-button>
                   </el-card>
                 </el-row>
             </el-form>
@@ -50,8 +50,10 @@ const content = `
 * element
 * webpack
 `
+import { mapGetters } from 'vuex'
 import MarkdownEditor from '@/components/MarkdownEditor'
-import { getCategorys, createPost } from '@/api/wiki'
+import { getCategorys, createPost, getPostDetail, editPost, saveDraft } from '@/api/wiki'
+
 export default {
   name: 'ArticleDetail',
   components: { MarkdownEditor },
@@ -59,6 +61,10 @@ export default {
     isEdit: {
       type: Boolean,
       default: false
+    },
+    isDraft: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
@@ -74,6 +80,8 @@ export default {
         }
       }
       return {
+        id: null,
+        draft_id: null,
         categoryList: [],
         query: {
           page: 1,
@@ -100,6 +108,10 @@ export default {
       }
   },
   computed: {
+    ...mapGetters([
+        'uid'
+    ]),
+    
     language() {
       return this.languageTypeList['en']
     },
@@ -109,12 +121,49 @@ export default {
   },
   created() {
     this.getCategory()
+    if (this.isEdit) {
+    const id = this.$route.params && this.$route.params.id
+    this.id = id 
+    this.fetchData(id)
+    }
+    const draft_id = this.$route.query && this.$route.query.id
+    this.draft_id = draft_id
   },
   methods: {
     async getCategory() {
       const data = await getCategorys()
       this.categoryList = data.items
     },
+    fetchData(id) {
+      getPostDetail(id).then(response => {
+        this.postForm.title = response.title
+        this.postForm.category_id = response.category_id
+        import('showdown').then(showdown => { //用了 Dynamic import
+        const converter = new showdown.Converter();//初始化
+        this.postForm.body = converter.makeMarkdown(response.body)//转化
+      })
+
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+
+    handleSave() {
+      const query = { "draft_id": this.id }
+      this.html = this.$refs.markdownEditor.getHtml()
+      const data = {title: this.postForm.title, body:this.html, category_id: this.categroy }
+      saveDraft(query, data).then(res => {
+            this.$message({
+              message: '已保存',
+              type: 'success',
+              duration: 2000
+            })
+      }).catch(err => {
+        console.log(err)
+      })
+
+    },
+  
     submitForm() {
       console.log(this.postForm)
       this.$refs.postForm.validate(valid => {
@@ -125,19 +174,36 @@ export default {
 
           const data = {title: this.postForm.title, body:this.html, category_id: this.categroy }
 
-          createPost(data).then(res => {
-            console.log(this.html)
-            this.$notify({
-              title: '成功',
-              message: '发布文章成功',
-              type: 'success',
-              duration: 2000
+          if (this.id && !this.isDraft) {
+            editPost(this.id, data).then(res => {
+              this.$notify({
+                title: '成功',
+                message: '发布文章成功',
+                type: 'success',
+                duration: 2000
+              })
+              this.$store.commit('wiki/SET_QUERY', this.query)
+              this.$router.push({path: "/wiki/posts"})
+            }).catch(err => {
+              console.log(err)
             })
-            this.$store.commit('wiki/SET_QUERY', this.query)
-            this.$router.push({path: "/wiki/posts"})
-          }).catch(err => {
-            console.log(err)
-          })
+          } else {
+            createPost(data).then(res => {
+              console.log(this.html)
+              this.$notify({
+                title: '成功',
+                message: '发布文章成功',
+                type: 'success',
+                duration: 2000
+              })
+              this.$store.commit('wiki/SET_QUERY', this.query)
+              this.$router.push({path: "/wiki/posts"})
+            }).catch(err => {
+              console.log(err)
+            })
+          }
+          
+
 
           // this.postForm.body = this.html
 
@@ -145,6 +211,7 @@ export default {
           //   const converter = new showdown.Converter();//初始化
           //   this.postForm.body = converter.makeMarkdown(this.html)//转化
           // })
+
 
 
           // this.postForm.status = 'published'
@@ -158,10 +225,10 @@ export default {
   }
 }
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 @import "~@/styles/mixin.scss";
 
-.title .el-input__inner {
+.title /deep/ .el-input__inner {
       height: 60px;
   } 
 .createPost-container {

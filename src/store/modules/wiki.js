@@ -38,7 +38,6 @@ const actions = {
     getPosts({ commit }, params) {
         return new Promise((resolve, reject) => {
             getPosts(params).then(response => {
-                console.log(response)
                 commit('SET_POSTS', response)
                 resolve()
             }).catch(error => {

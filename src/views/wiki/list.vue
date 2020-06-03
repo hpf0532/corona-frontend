@@ -1,6 +1,6 @@
 <template>
     <div class="index-container">
-        <div class="filter-container">filter</div>
+        <div class="filter-container"></div>
         <el-row :gutter="10">
             <el-col :span="18">
                 <post-list></post-list>
@@ -8,7 +8,7 @@
             </el-col>
             <el-col :span="6">
                 <div>
-                <router-link to="/wiki/posts/edit">
+                <router-link to="/wiki/posts/create">
                     <el-button>我要写文章</el-button>
                 </router-link>
                 <category-info class="category-list"></category-info>
@@ -30,14 +30,17 @@ export default {
     components: { PostList, CategoryInfo },
     data() {
         return {
-
+            query: {
+                page: 1,
+                limit: 20
+            }
         }
     },
     created() {
         this.getCategoryList()
     },
     mounted() {
-    
+         this.$store.commit('wiki/SET_QUERY', this.query)
     },
     methods: {
         async getCategoryList() {

@@ -4,6 +4,11 @@
             <div slot="header" class="clearfix">
                 <span>文章分类</span>
             </div>
+            <div class="category-item all-posts">
+                <span><el-button type="text" @click="filterPost()">所有文章</el-button></span>
+
+            </div>
+            <hr/>
             <div v-for="item in categoryList" :key="item.id" class="text item">
                 <div class="category-item">
                     <span><el-button type="text" @click="filterPost(item.id)">{{ item.name }}</el-button></span>
@@ -53,12 +58,8 @@ export default {
             })
         },
         filterPost(id) {
-            console.log(id)
             this.$set(this.query, "category_id", id)
             this.$store.commit('wiki/SET_QUERY', this.query)
-            console.log(this.query)
-            console.log('----------------------')
-            console.log(this.filterQuery)
 
         }
     }    
@@ -71,9 +72,12 @@ hr {
     border-top:2px solid #EEEEEE;
 }
 .category-item {
-    margin: 12px 0px 12px 0px;
+    margin: 10px 0px 10px 0px;
     .item {
         padding: 15px 15px 15px 15px;
     }
+}
+.all-posts {
+    margin-top: -5px;
 }
 </style>

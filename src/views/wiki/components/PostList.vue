@@ -16,13 +16,19 @@
                 <div class="summary">
                     <p>{{ item.desc }}</p>
                 </div>
+                <div v-if="isAuthor" class="action fr">
+                    <router-link :to="'/wiki/posts/edit/'+item.id" class="action-type">
+                        编辑
+                    </router-link>
+                    <el-button class="delete" type="text" @click="handleDelete(item.id)">删除</el-button>
+                </div>
             </div>
             <hr>
         </div>
         </div>
         <div class="none-post" v-else>
             还没有文章哦 
-            <router-link class="link-create" to="/wiki/posts/edit">
+            <router-link class="link-create" to="/wiki/posts/create">
                 动手写一篇
             </router-link>
         </div>
@@ -39,6 +45,7 @@
 const avatarPrefix = '?imageView2/1/w/80/h/80'
 import { mapGetters } from 'vuex'
 import { parseTime } from '@/utils'
+import { deletePost } from '@/api/wiki'
 import Pagination from '@/components/Pagination'
 export default {
     components: { Pagination },
@@ -51,6 +58,10 @@ export default {
                 limit: 20,
             }
         }
+        },
+        isAuthor: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
@@ -62,7 +73,8 @@ export default {
         ...mapGetters([
         'postList',
         'total',
-        'filterQuery'
+        'filterQuery',
+        'uid'
         ]),
     },
     created() {
@@ -70,25 +82,45 @@ export default {
     watch: {
         filterQuery: {
             handler(newName, oldName){
-                console.log("watch")
                 this.fetchPosts()
             },
-            immediate: true,
+            // 页面中处理
+            // immediate: true,
             deep: true
         }
     },
     methods: {
         fetchPosts() {
             this.$store.dispatch('wiki/getPosts', this.filterQuery).then(response => {
-                console.log('aaaaaaaaaaaaaaaaaaa')
-                console.log(this.filterQuery)
-                // console.log(this.postList)
-                // console.log(this.total)
                 // this.total = this.postList.count
             }).catch(e => {
                 console.log(e)
             })
-        }
+        },
+    async handleDelete(id) {
+      await this.$confirm('确认删除这篇文档?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'error'
+      }).then(() => {
+        deletePost(id).then(data => {
+
+          this.$store.dispatch('wiki/getPosts', this.filterQuery)
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+        }).catch((e) => {
+          console.log(e)
+          this.$message.error('删除失败')
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
+    }
     }
 }
 </script>
@@ -137,8 +169,37 @@ export default {
     .link-type:hover {
         color: rgb(32, 160, 255);
     }
+    .action-type {
+        margin-right: 10px;
+    }
+    .delete,
+    .delete:focus,
+    .action-type,
+    .action-type:focus {
+        color: #999;
+        cursor: pointer;
+    }
+    .delete:hover,
+    .action-type:hover {
+        color: rgb(32, 160, 255);
+    }
     .summary {
         line-height: 1.5;
+    }
+    .delete {
+        font-size: 12px;
+    }
+    .action {
+        color: #999;
+        font-size: 12px;
+    }
+    .fr {
+        float: right;
+    }
+    &:after {
+        content: '';
+        display: block;
+        clear: both;
     }
 }
 .none-post {

@@ -59,3 +59,47 @@ export function getPostDetail(id) {
     method: 'get'
   })
 }
+
+
+// 编辑文章接口
+export function editPost(id, data) {
+  return request({
+    url: `/post/${id}`,
+    method: 'put',
+    data
+  })
+}
+
+// 删除文章接口
+export function deletePost(id) {
+  return request({
+    url: `/post/${id}`,
+    method: 'delete'
+  })
+}
+
+// 获取草稿接口
+export function getDrafts() {
+  return request({
+    url: "/drafts",
+    method: 'get'
+  })
+}
+
+// 删除单一草稿接口
+export function deleteDraft(id) {
+  return request({
+    url: `/draft/${id}`,
+    method: 'delete'
+  })
+}
+
+// 保存草稿接口
+export function saveDraft(params, data) {
+  return request({
+    url: '/drafts',
+    method: 'post',
+    params,
+    data
+  })
+}

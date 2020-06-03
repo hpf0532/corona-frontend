@@ -259,9 +259,16 @@ export const constantRoutes = [
             meta: { title: '文章列表', icon: 'post' }
           },
           {
-            path: 'edit',
-            name: 'Edit',
+            path: 'create',
+            name: 'Create',
             component: () => import('@/views/wiki/create'),
+            meta: { title: '创建文章' },
+            hidden: true
+          },
+          {
+            path: 'edit/:id(\\d+)',
+            name: 'Edit',
+            component: () => import('@/views/wiki/edit'),
             meta: { title: '编辑文章' },
             hidden: true
           },
@@ -271,9 +278,30 @@ export const constantRoutes = [
             name: 'DocDetail',
             meta: { title: '文档正文' },
             hidden: true
-          }
+          },
+          {
+            path: 'draft/:id(\\d+)',
+            name: 'Draft',
+            component: () => import('@/views/wiki/draft'),
+            meta: { title: '编辑草稿' },
+            hidden: true
+          },
+
+
         ]
 
+      },
+      {
+        path: 'mypost',
+        component: () => import('@/views/wiki/mypost'),
+        name: 'MyPost',
+        meta: { title: '我的文档', icon: 'me' },
+      },
+      {
+        path: 'draft-box',
+        component: () => import('@/views/wiki/draft-box'),
+        name: 'Draft',
+        meta: { title: '草稿箱', icon: 'draft' },
       },
       {
         path: 'category',
