@@ -1,8 +1,12 @@
 <template>
     <div class="index-container">
-        <div class="filter-container"></div>
         <el-row :gutter="10">
             <el-col :span="18">
+            <div class="filter-container">
+                  <el-input clearable class="search" placeholder="搜索标题" v-model="title">
+                    <el-button slot="append" icon="el-icon-search" @click="handleSearch()"></el-button>
+                   </el-input>
+            </div>
                 <post-list></post-list>
 
             </el-col>
@@ -33,7 +37,8 @@ export default {
             query: {
                 page: 1,
                 limit: 20
-            }
+            },
+            title: ''
         }
     },
     created() {
@@ -53,6 +58,10 @@ export default {
         test() {
             console.log(this.categoryList)
             console.log(this.haha)
+        },
+        handleSearch() {
+            this.$set(this.query, "title", this.title)
+            this.$store.commit('wiki/SET_QUERY', this.query)
         }
     },
     computed: {
@@ -70,5 +79,17 @@ export default {
 }
 .index-container {
     padding: 20px 20px 20px 45px;
+}
+.filter-container {
+    .search {
+        width: 300px;
+        float: right;
+    }
+    &:after {
+        content: '';
+        display: block;
+        clear: both;
+    }
+
 }
 </style>

@@ -52,7 +52,7 @@ const content = `
 `
 import { mapGetters } from 'vuex'
 import MarkdownEditor from '@/components/MarkdownEditor'
-import { getCategorys, createPost, getPostDetail, editPost, saveDraft } from '@/api/wiki'
+import { getCategorys, createPost, getPostDetail, editPost, saveDraft, getStoken } from '@/api/wiki'
 
 export default {
   name: 'ArticleDetail',
@@ -81,6 +81,7 @@ export default {
       }
       return {
         id: null,
+        stoken: '',
         draft_id: null,
         categoryList: [],
         query: {
@@ -111,7 +112,6 @@ export default {
     ...mapGetters([
         'uid'
     ]),
-    
     language() {
       return this.languageTypeList['en']
     },
@@ -121,6 +121,7 @@ export default {
   },
   created() {
     this.getCategory()
+    this.fetchStoken()
     if (this.isEdit) {
     const id = this.$route.params && this.$route.params.id
     this.id = id 
@@ -143,6 +144,14 @@ export default {
         this.postForm.body = converter.makeMarkdown(response.body)//转化
       })
 
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+
+    fetchStoken() {
+      getStoken().then(res => {
+        this.stoken = res.stoken
       }).catch(err => {
         console.log(err)
       })
@@ -174,6 +183,7 @@ export default {
           this.html = this.$refs.markdownEditor.getHtml()
 
           const data = {title: this.postForm.title, body:this.html, category_id: this.categroy }
+          const params = { stoken: this.stoken }
 
           if (this.id && !this.isDraft) {
             editPost(this.id, data).then(res => {
@@ -189,7 +199,7 @@ export default {
               console.log(err)
             })
           } else {
-            createPost(data).then(res => {
+            createPost(data, params).then(res => {
               console.log(this.html)
               this.$notify({
                 title: '成功',

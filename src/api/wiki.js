@@ -1,5 +1,13 @@
 import request from '@/utils/request'
 
+// 获取stoken接口
+export function getStoken() {
+  return request({
+    url: '/stoken',
+    method: 'get'
+  })
+}
+
 // 获取分类列表接口
 export function getCategorys() {
     return request({
@@ -35,10 +43,11 @@ export function editCategory(id, data) {
 }
 
 // 新建文章接口
-export function createPost(data) {
+export function createPost(data, params) {
   return request({
     url: 'posts',
     method: 'post',
+    params,
     data
   })
 }
