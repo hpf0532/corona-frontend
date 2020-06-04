@@ -48,7 +48,7 @@
     <el-col :span="12">
         <div class="grid-content bg-purple" style="margin-right:20px">
           <el-form-item label="参数列表">
-          <el-select v-model="taskOptions" placeholder="请选择参数" style="width:100%" @change="editOption">
+          <el-select v-model="taskOptions" placeholder="请选择参数" style="width:100%" filterable @change="editOption">
               <el-option
                 v-for="item in taskOptions.items"
                 :key="item.id"
