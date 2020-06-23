@@ -66,6 +66,18 @@
           </template>
         </el-table-column>
 
+        <el-table-column label="是否需上传">
+          <template slot-scope="{row}">
+            <template v-if="row.edit">
+              <el-radio-group v-model="row.upload">
+                <el-radio :label="true">是</el-radio>
+                <el-radio :label="false">否</el-radio>
+              </el-radio-group>
+            </template>
+            <span v-else>{{ row.upload }}</span>
+          </template>
+        </el-table-column>
+
         <el-table-column label="Actions">
 
           <template slot-scope="{row}">
@@ -156,6 +168,7 @@ export default {
         v.originalAuthor = v.author
         v.originalInfo = v.information
         v.originalIsenv = v.is_env
+        v.originalUpload = v.upload
         return v
       })
       this.listLoading = false
@@ -167,10 +180,12 @@ export default {
         author: '',
         information: '',
         is_env: false,
+        upload: false,
         originalName: '',
         originalAuthor: '',
         originalInfo: '',
-        originalIsenv: ''
+        originalIsenv: '',
+        originalUpload: ''
       }
       console.log(this.item)
       this.$set(this.item, 'create', true)
@@ -183,6 +198,7 @@ export default {
       row.author = row.originalAuthor
       row.information = row.originalInfo
       row.is_env = row.originalIsenv
+      row.upload = row.originalUpload
       row.edit = false
       this.$message({
         message: '取消编辑',
@@ -241,7 +257,7 @@ export default {
         return
       }
 
-      const { id, name, author, information, is_env } = row
+      const { id, name, author, information, is_env, upload } = row
       // console.log(name, description )
       // row.validate()
 
@@ -250,7 +266,8 @@ export default {
           name: name.trim(),
           author: author.trim(),
           information: information.trim(),
-          is_env: is_env
+          is_env: is_env,
+          upload: upload
         })
         row.id = this.newItem.id
         // console.log(this.newItem)
@@ -261,7 +278,8 @@ export default {
             name: name.trim(),
             author: author.trim(),
             information: information.trim(),
-            is_env: is_env
+            is_env: is_env,
+            upload: upload
           }
         )
       }
@@ -272,6 +290,7 @@ export default {
       row.originalAuthor = row.author
       row.originalInfo = row.infomation
       row.originalIsenv = row.is_env
+      row.originalUpload = row.upload
       this.$message({
         message: '已保存',
         type: 'success'
