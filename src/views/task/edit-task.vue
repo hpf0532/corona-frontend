@@ -78,10 +78,26 @@
       </div>
       </el-col>
     </el-row>
+    <el-row>
+      <el-col :span="12">
+        <div>
+          <el-upload
+            v-if="showUpload"
+            ref="upload"
+            class="upload-demo"
+            action="https://jsonplaceholder.typicode.com/posts/"
+            :http-request = "customUpload"
+            :file-list="fileList">
+            <el-button size="small" type="primary">点击上传</el-button>
+            <div slot="tip" class="el-upload__tip">只能上传.zip文件</div>
+          </el-upload>
+        </div>
+      </el-col>
+    </el-row>
     
 
 
-    <div class="editor-container">
+    <div class="editor-container" style="margin-top:15px">
       <json-editor ref="jsonEditor" v-model="taskForm.extra_vars" />
     </div>
 
@@ -93,12 +109,14 @@
 <script>
 import JsonEditor from '@/components/JsonEditor'
 import { hostGroupSelect, getPlayBooks } from '@/api/inventory'
-import { submitTask, getTaskOptions } from '@/api/task'
+import { submitTask, getTaskOptions, distUpload } from '@/api/task'
 export default {
     name: 'TaskEditPage',
     components: { JsonEditor },
     data() {
       return {
+        showUpload: false,
+        upload: false,
         isEnv: false,
         playItem: '',
         checked: false,
@@ -119,7 +137,9 @@ export default {
         taskQuery: {
           playbook: undefined,
           env: undefined
-        }
+        },
+        fileList: [],
+        optName: ''
       }
     },
     created() {
@@ -127,6 +147,26 @@ export default {
       this.getPlay()
     },
     methods: {
+      customUpload(file) {
+        // this.generatorFileMd5(file.file)
+        // 自定义上传
+        let param = new FormData()
+        param.append('files',file.file)
+        let query = {"option": this.optName}
+        distUpload(param, query).then(res => {
+          if (res.code === 2000){
+            this.$message.success("文件上传成功")
+
+          }else{
+            this.$message.error("文件上传失败")
+
+          }
+          this.$refs.upload.clearFiles()
+
+
+        })
+      },
+
       async getData(){
         const { data } = await hostGroupSelect()
         this.list = data
@@ -164,6 +204,13 @@ export default {
           this.taskOptions = ''
         }
         this.taskQuery.env = undefined
+
+        // 判断是否需要上传
+        if(this.playsObj[val].upload){
+          this.upload = true
+        }else{
+          this.upload = false
+        }
       },
       test(event) {
         
@@ -181,6 +228,13 @@ export default {
         return acc
       }, {})
 
+        // 显示上传按钮
+        if (this.upload) {
+          this.showUpload = true
+        }else{
+          this.showUpload = false
+        }
+        this.optName = this.taskOptObj[val].name
         this.taskForm.extra_vars = this.taskOptObj[val].content
       },
       async handleSubmit() {

@@ -78,3 +78,13 @@ export function getTaskOptions(params) {
     params
   })
 }
+
+export function distUpload(param, params) {
+  return request({
+    method: 'post',
+    url: '/upload_dist',
+    headers: {'Content-Type':'multipart/form-data'},
+    data: param,
+    params: params
+  })
+}
