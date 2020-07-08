@@ -314,7 +314,7 @@ export default {
             console.log(err)
             self.$message.error(`文件${files.name}上传失败`);
           })
-        }, Math.round(Math.random()* 4000)
+        }, Math.round(Math.random()* 2000)
       )
 
       // setTimeout(function(){ uploadFile() }, Math.round(Math.random()* 1500))
