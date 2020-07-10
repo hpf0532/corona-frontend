@@ -1,5 +1,7 @@
 <template>
-    <div class="post-container">
+    <div class="post-container"  v-loading="loading"     element-loading-text="拼命加载中"
+    element-loading-spinner="el-icon-loading"
+    >
         <h1 class="artical-title">{{ post.title }}</h1>
         <div class="artical-title-list">
             <div class="article-info">
@@ -41,6 +43,7 @@ export default {
     },
     data() {
         return {
+            loading: false,
             post: {},
             avatarPrefix,
         }
@@ -57,8 +60,10 @@ export default {
     },
     methods: {
         fetchPostDetail() {
+            this.loading = true
             getPostDetail(this.id).then(response => {
                 this.post = response
+                this.loading = false
             }).catch(error => {
                 console.log(error)
             })
