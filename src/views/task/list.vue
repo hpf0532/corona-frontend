@@ -60,8 +60,8 @@
       </el-table-column>
       <el-table-column label="任务状态" class-name="status-col" width="120">
         <template slot-scope="{row}">
-          <el-tag :type="row.state | statusFilter">
-            {{ row.state | statusDisplayFilter }}
+          <el-tag :type="row.state.state_code | statusFilter">
+            {{ row.state.state_text }}
           </el-tag>
         </template>
       </el-table-column>
@@ -93,18 +93,12 @@ export default {
   filters: {
     statusFilter(status) {
       const statusMap = {
-        true: 'success',
-        false: 'danger'
+        1: 'primary',
+        2: 'success',
+        3: 'danger'
       }
       return statusMap[status]
     },
-    statusDisplayFilter(status) {
-      const displayMap = {
-        true: '已完成',
-        false: '执行中'
-      }
-      return displayMap[status]
-    }
   },
   components: { Pagination },
   data() {
