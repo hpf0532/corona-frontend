@@ -110,12 +110,14 @@
 import JsonEditor from '@/components/JsonEditor'
 import { hostGroupSelect, getPlayBooks } from '@/api/inventory'
 import { submitTask, getTaskOptions, distUpload } from '@/api/task'
+import { getStoken } from '@/api/wiki'
 export default {
     name: 'TaskEditPage',
     components: { JsonEditor },
     data() {
       return {
         showUpload: false,
+        stoken: '',
         upload: false,
         isEnv: false,
         playItem: '',
@@ -144,7 +146,8 @@ export default {
     },
     created() {
       this.getData(),
-      this.getPlay()
+      this.getPlay(),
+      this.fetchStoken()
     },
     methods: {
       customUpload(file) {
@@ -164,6 +167,13 @@ export default {
           this.$refs.upload.clearFiles()
 
 
+        })
+      },
+      fetchStoken() {
+        getStoken().then(res => {
+          this.stoken = res.stoken
+        }).catch(err => {
+          console.log(err)
         })
       },
 
@@ -253,13 +263,14 @@ export default {
           // console.log(111)
         }else{
           this.taskForm.extra_vars = JSON.parse(this.taskForm.extra_vars)
-        }        
+        }
+        const params = { stoken: this.stoken }        
         const taskResult = await submitTask({
           hosts: this.taskForm.hosts,
           playbook: this.taskForm.playbook,
           option: this.taskForm.options,
           extra_vars: this.taskForm.extra_vars
-        })
+        }, params)
         this.$router.push({name:'TaskDetail', params: {id: taskResult.pk}})
       }
     }

@@ -22,11 +22,12 @@ export function flushTask(id) {
   })
 }
 
-export function submitTask(data) {
+export function submitTask(data, params) {
   return request({
     url: '/tasks',
     method: 'post',
-    data
+    data,
+    params
   })
 }
 
