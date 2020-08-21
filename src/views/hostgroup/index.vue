@@ -103,7 +103,7 @@
               type="primary"
               size="small"
               icon="el-icon-edit"
-              @click="row.edit=!row.edit"
+              @click="handleEdit(row)"
             >
               编辑
             </el-button>
@@ -170,12 +170,35 @@ export default {
       this.listLoading = false
     },
     createItem() {
+      for (let i of this.list) {
+        if (i.edit) {
+          return this.$message({
+                message: '请先保存当前编辑项',
+                type: 'error'
+            })
+        }
+      }
       this.item = { id: '', name: '', description: '', originalName: '', originalDesc: '' }
       console.log(this.item)
       this.$set(this.item, 'edit', true)
       this.list.push(this.item)
     },
+    handleEdit(row) {
+      for (let i of this.list) {
+        if (i.edit) {
+          return this.$message({
+                message: '请先保存当前编辑项',
+                type: 'error'
+            })
+        }
+      }
+      row.edit=!row.edit
+    },
     cancelEdit(row) {
+      // 新建组未保存过点取消会直接删除
+      if (!row.id) {
+        this.deleteItem(row)
+      }
       row.name = row.originalName
       row.description = row.originalDesc
       row.edit = false
