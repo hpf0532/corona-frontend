@@ -95,7 +95,8 @@ export default {
       const statusMap = {
         1: 'primary',
         2: 'success',
-        3: 'danger'
+        3: 'danger',
+        4: 'warning'
       }
       return statusMap[status]
     },

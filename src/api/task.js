@@ -89,3 +89,12 @@ export function distUpload(param, params) {
     params: params
   })
 }
+
+// 取消任务接口
+export function taskCancel(data) {
+  return request({
+    method: 'post',
+    url: '/stop_task',
+    data: data,
+  })
+}

@@ -1,6 +1,7 @@
 <template>
   <div class="app-container">
     <!-- <table v-loading="dataLoading" class="table table-bordered text-nowrap"> -->
+    <el-button style="float:right;margin-bottom:5px" type="primary" @click="handleCancel" plain :disabled="cancelled">发错了？点我取消</el-button>
     <table v-loading="dataLoading" class="table table-bordered text-nowrap">
       <tbody>
         <tr style="background-color: #3c8dbc80;font-weight: bold;">
@@ -82,7 +83,7 @@
 </template>
 <script>
 import jsonView from '@/components/json-view'
-import { getTaskDetail, flushTask } from '@/api/task'
+import { getTaskDetail, flushTask, taskCancel } from '@/api/task'
 import { parseTime } from '@/utils'
 export default {
   components: {
@@ -98,6 +99,7 @@ export default {
       celeryResult: {},
       buttonStatus: false,
       celeryStatus: false,
+      cancelled: false,
       timer: null
     }
   },
@@ -119,6 +121,7 @@ export default {
       this.id = this.$route.params.id
       this.taskDetail = await getTaskDetail(this.id)
       this.extraVars = this.taskDetail.extra_vars
+      this.cancelled = this.taskDetail.cancelled
 
       this.ansibleResult = this.taskDetail.ansible_result
       // 关闭轮询按钮
@@ -154,6 +157,14 @@ export default {
           clearInterval(this.timer)
         }
       }
+    },
+    async handleCancel() {
+      const result = await taskCancel({"task_id": this.taskDetail.celery_id})
+      this.cancelled = result.cancelled
+      this.$message({
+        message: result.msg,
+        type: 'success'
+      });
     },
     // 刷新任务数据
     flushResult() {
