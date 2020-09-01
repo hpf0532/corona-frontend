@@ -141,8 +141,9 @@ export default {
       this.dataLoading = false
     },
     async getResult() {
-      const { ansible_result, celery_result } = await flushTask(this.id)
+      const { ansible_result, celery_result, cancelled } = await flushTask(this.id)
       this.ansibleResult = ansible_result
+      this.cancelled = cancelled
       // 关闭轮询按钮
       if (this.ansibleResult) {
         this.buttonStatus = true
