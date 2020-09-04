@@ -104,12 +104,24 @@
     <el-button type="primary" style="margin-top:10px;" @click.native.prevent="handleSubmit">提交</el-button>
     <el-checkbox v-model="checked" style="margin-left:30px">提交锁，防止误提交</el-checkbox>
   </el-form>
+  <el-divider></el-divider>
+  <div>
+    <el-button type="success" size="medium" round @click="startSSHTest">测试ssh连接</el-button>
+    <el-button type="danger" size="medium" round @click="stopSSHTest">停止测试</el-button>
+    <el-checkbox style="margin-left:30px" v-model="clean">停止时,清空测试记录</el-checkbox>
+    <el-card class="ssh-card">
+      <div v-for="line, index in testSSHResult" :key="index">
+        <p>{{line[0]}} 用时{{line[1]}}秒</p>
+      </div>
+    </el-card>
+  </div>
+
   </div>
 </template>
 <script>
 import JsonEditor from '@/components/JsonEditor'
 import { hostGroupSelect, getPlayBooks } from '@/api/inventory'
-import { submitTask, getTaskOptions, distUpload } from '@/api/task'
+import { submitTask, getTaskOptions, distUpload, testSSHConn } from '@/api/task'
 import { getStoken } from '@/api/wiki'
 export default {
     name: 'TaskEditPage',
@@ -141,7 +153,10 @@ export default {
           env: undefined
         },
         fileList: [],
-        optName: ''
+        optName: '',
+        testSSHResult: [],
+        timer: null,
+        clean: false
       }
     },
     created() {
@@ -149,6 +164,12 @@ export default {
       this.getPlay(),
       this.fetchStoken()
     },
+    destroyed() {
+      // 路由改变时清楚timer
+      if (this.timer){
+        clearInterval(this.timer)
+    }
+  },
     methods: {
       customUpload(file) {
         // this.generatorFileMd5(file.file)
@@ -164,117 +185,151 @@ export default {
             this.$message.error("文件上传失败")
 
           }
-          this.$refs.upload.clearFiles()
+        this.$refs.upload.clearFiles()
+      })
+    },
+    fetchStoken() {
+      getStoken().then(res => {
+        this.stoken = res.stoken
+      }).catch(err => {
+        console.log(err)
+      })
+    },
 
+    async getData() {
+      const { data } = await hostGroupSelect()
+      this.list = data
+      console.log(data)
+    },
 
-        })
-      },
-      fetchStoken() {
-        getStoken().then(res => {
-          this.stoken = res.stoken
-        }).catch(err => {
-          console.log(err)
-        })
-      },
-
-      async getData(){
-        const { data } = await hostGroupSelect()
-        this.list = data
-        console.log(data)
-      },
-
-      async getPlay() {
-        const { items } = await getPlayBooks()
-        this.playbooks = items
-        this.playsObj = this.playbooks.reduce((acc, cur) => {
+    async getPlay() {
+      const { items } = await getPlayBooks()
+      this.playbooks = items
+      this.playsObj = this.playbooks.reduce((acc, cur) => {
         acc[cur.id] = cur
         return acc
       }, {})
-        console.log(this.playsObj)
-      },
+      console.log(this.playsObj)
+    },
 
-      async changeSwitch() {
-        this.taskForm.extra_vars = null
+    async changeSwitch() {
+      this.taskForm.extra_vars = null
+      this.taskOptions = ''
+      this.taskOptions = await getTaskOptions(this.taskQuery)
+      if (this.taskOptions.items.length === 0) {
         this.taskOptions = ''
-        this.taskOptions = await getTaskOptions(this.taskQuery)
-        if(this.taskOptions.items.length == 0){
-          this.taskOptions = ''
-        }
-
-      },
-
-      async getPlayOptions(val) {
-        this.taskForm.extra_vars = null
-        this.taskQuery.env = undefined
-        this.taskOptions = ''
-        this.isEnv = this.playsObj[val].is_env
-        this.taskQuery.playbook = val
-        this.taskOptions = await getTaskOptions(this.taskQuery)
-        if(this.taskOptions.items.length == 0){
-          this.taskOptions = ''
-        }
-        this.taskQuery.env = undefined
-
-        // 判断是否需要上传
-        if(this.playsObj[val].upload){
-          this.upload = true
-        }else{
-          this.upload = false
-        }
-      },
-      test(event) {
-        
-        console.log(event.target.innerText)
-        // let a = this.list.find(event.target.innerText)
-        // console.log(a)
-      },
-      async editOption(val) {
-        const data = await getTaskOptions(this.taskQuery)
-        this.taskOptions = data
-        console.log(this.taskOptions.items)
-        this.taskForm.options = val
-        this.taskOptObj = data.items.reduce((acc, cur) => {
-        acc[cur.id] = cur
-        return acc
-      }, {})
-
-        // 显示上传按钮
-        if (this.upload) {
-          this.showUpload = true
-        }else{
-          this.showUpload = false
-        }
-        this.optName = this.taskOptObj[val].name
-        this.taskForm.extra_vars = this.taskOptObj[val].content
-      },
-      async handleSubmit() {
-        console.log(this.taskForm)
-        if(!this.checked) {
-          this.$message({
-            showClose: true,
-            message: '请打开锁',
-            type: 'error'
-         })
-         return false
-        }
-        console.log(this.taskForm.extra_vars)
-        if(!this.taskForm.extra_vars) {
-          this.taskForm.extra_vars = {}
-          // console.log(111)
-        }else{
-          this.taskForm.extra_vars = JSON.parse(this.taskForm.extra_vars)
-        }
-        const params = { stoken: this.stoken }        
-        const taskResult = await submitTask({
-          hosts: this.taskForm.hosts,
-          playbook: this.taskForm.playbook,
-          option: this.taskForm.options,
-          extra_vars: this.taskForm.extra_vars
-        }, params)
-        this.$router.push({name:'TaskDetail', params: {id: taskResult.pk}})
       }
-    }
+    },
+
+    async getPlayOptions(val) {
+      this.taskForm.extra_vars = null
+      this.taskQuery.env = undefined
+      this.taskOptions = ''
+      this.isEnv = this.playsObj[val].is_env
+      this.taskQuery.playbook = val
+      this.taskOptions = await getTaskOptions(this.taskQuery)
+      if (this.taskOptions.items.length === 0) {
+        this.taskOptions = ''
+      }
+      this.taskQuery.env = undefined
+
+      // 判断是否需要上传
+      if (this.playsObj[val].upload) {
+        this.upload = true
+      } else {
+        this.upload = false
+      }
+    },
+    test(event) {
+      console.log(event.target.innerText)
+      // let a = this.list.find(event.target.innerText)
+      // console.log(a)
+    },
+    async editOption(val) {
+      const data = await getTaskOptions(this.taskQuery)
+      this.taskOptions = data
+      console.log(this.taskOptions.items)
+      this.taskForm.options = val
+      this.taskOptObj = data.items.reduce((acc, cur) => {
+        acc[cur.id] = cur
+        return acc
+      }, {})
+
+      // 显示上传按钮
+      if (this.upload) {
+        this.showUpload = true
+      } else {
+        this.showUpload = false
+      }
+      this.optName = this.taskOptObj[val].name
+      this.taskForm.extra_vars = this.taskOptObj[val].content
+    },
+    async handleSubmit() {
+      console.log(this.taskForm)
+      if (!this.checked) {
+        this.$message({
+          showClose: true,
+          message: '请打开锁',
+          type: 'error'
+        })
+        return false
+      }
+      console.log(this.taskForm.extra_vars)
+      if (!this.taskForm.extra_vars) {
+        this.taskForm.extra_vars = {}
+        // console.log(111)
+      } else {
+        this.taskForm.extra_vars = JSON.parse(this.taskForm.extra_vars)
+      }
+      const params = { stoken: this.stoken }
+      const taskResult = await submitTask({
+        hosts: this.taskForm.hosts,
+        playbook: this.taskForm.playbook,
+        option: this.taskForm.options,
+        extra_vars: this.taskForm.extra_vars
+      }, params)
+      this.$router.push({ name: 'TaskDetail', params: { id: taskResult.pk }})
+    },
+    async getSSHResult() {
+      const { time, msg } = await testSSHConn()
+      this.testSSHResult.push([msg, time])
+    },
+    flushResult() {
+      this.timer = setInterval(
+        () => {
+          setTimeout(this.getSSHResult, 0)
+        }, 2000)
+    },
+    startSSHTest() {
+      if (this.timer) {
+        console.log(this.timer)
+        return
+      }
+      this.testSSHResult = []
+      this.flushResult()
+      this.$message({
+        message: '开始测试ssh连接',
+        type: 'success'
+      })
+    },
+    stopSSHTest() {
+      if (this.timer) {
+        clearInterval(this.timer)
+        this.timer = null
+      }
+      if (this.clean) {
+        this.testSSHResult = []
+      }
+      this.$message({
+        message: '测试已结束',
+        type: 'success'
+      })
+    },
+    // cleanTestResult() {
+    //   this.clean = !this.clean
+    // }
   }
+}
 </script>
 <style>
 .group:hover {
@@ -284,9 +339,10 @@ export default {
   color: #5B8DBC;
   text-align: center  ;
 }
-
-
-
-
-
+.ssh-card {
+  margin-top: 15px;
+  width: 480px;
+  height: 300px;
+  overflow-y: scroll;
+}
 </style>

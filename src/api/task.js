@@ -98,3 +98,11 @@ export function taskCancel(data) {
     data: data,
   })
 }
+
+// 测试ssh连接接口
+export function testSSHConn() {
+  return request({
+    method: 'get',
+    url: '/test_ssh',
+  })
+}
