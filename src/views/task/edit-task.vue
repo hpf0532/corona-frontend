@@ -106,15 +106,15 @@
   </el-form>
   <el-divider></el-divider>
   <div>
-    <el-button type="success" size="medium" round @click="startSSHTest">测试ssh连接</el-button>
-    <el-button type="danger" size="medium" round @click="stopSSHTest">停止测试</el-button>
-    <el-checkbox style="margin-left:30px" v-model="clean">停止时,清空测试记录</el-checkbox>
-    <el-card class="ssh-card">
-      <div v-for="line, index in testSSHResult" :key="index">
-        <p>{{line[0]}} 用时{{line[1]}}秒</p>
-      </div>
-    </el-card>
-  </div>
+      <el-button type="success" size="medium" round @click="startSSHTest">测试ssh连接</el-button>
+      <el-button type="danger" size="medium" round @click="stopSSHTest">停止测试</el-button>
+      <el-checkbox style="margin-left:30px" v-model="clean">停止时,清空测试记录</el-checkbox>
+      <el-card class="ssh-card">
+        <div v-for="line, index in testSSHResult" :key="index">
+          <p :class="line[1]?'green-class':'red-class'">{{ index + 1 }} <span>{{ line[0] }}</span> 用时{{ line[2] }}秒</p>
+        </div>
+      </el-card>
+    </div>
 
   </div>
 </template>
@@ -124,67 +124,65 @@ import { hostGroupSelect, getPlayBooks } from '@/api/inventory'
 import { submitTask, getTaskOptions, distUpload, testSSHConn } from '@/api/task'
 import { getStoken } from '@/api/wiki'
 export default {
-    name: 'TaskEditPage',
-    components: { JsonEditor },
-    data() {
-      return {
-        showUpload: false,
-        stoken: '',
-        upload: false,
-        isEnv: false,
-        playItem: '',
-        checked: false,
-        labelPosition: 'top',
-        taskForm: {
-          hosts: '',
-          playbook: '',
-          options: '',
-          extra_vars: null
-        },
-        list: '',
-        playbooks: '',
-        playsObj: '',
-        taskOptObj: '',
+  name: 'TaskEditPage',
+  components: { JsonEditor },
+  data() {
+    return {
+      showUpload: false,
+      stoken: '',
+      upload: false,
+      isEnv: false,
+      playItem: '',
+      checked: false,
+      labelPosition: 'top',
+      taskForm: {
+        hosts: '',
+        playbook: '',
         options: '',
-        oldOptions: '',
-        taskOptions: '',
-        taskQuery: {
-          playbook: undefined,
-          env: undefined
-        },
-        fileList: [],
-        optName: '',
-        testSSHResult: [],
-        timer: null,
-        clean: false
-      }
-    },
-    created() {
-      this.getData(),
-      this.getPlay(),
-      this.fetchStoken()
-    },
-    destroyed() {
-      // 路由改变时清楚timer
-      if (this.timer){
-        clearInterval(this.timer)
+        extra_vars: null
+      },
+      list: '',
+      playbooks: '',
+      playsObj: '',
+      taskOptObj: '',
+      options: '',
+      oldOptions: '',
+      taskOptions: '',
+      taskQuery: {
+        playbook: undefined,
+        env: undefined
+      },
+      fileList: [],
+      optName: '',
+      testSSHResult: [],
+      timer: null,
+      clean: false
     }
   },
-    methods: {
-      customUpload(file) {
-        // this.generatorFileMd5(file.file)
-        // 自定义上传
-        let param = new FormData()
-        param.append('files',file.file)
-        let query = {"option": this.optName}
-        distUpload(param, query).then(res => {
-          if (res.code === 2000){
-            this.$message.success("文件上传成功")
-
-          }else{
-            this.$message.error("文件上传失败")
-
-          }
+  created() {
+    this.getData()
+    this.getPlay()
+    this.fetchStoken()
+  },
+  destroyed() {
+    // 路由改变时清楚timer
+    if (this.timer) {
+      clearInterval(this.timer)
+    }
+  },
+  methods: {
+    customUpload(file) {
+      // this.generatorFileMd5(file.file)
+      // 自定义上传
+      const param = new FormData()
+      param.append('files', file.file)
+      const query = { 'option': this.optName }
+      distUpload(param, query).then(res => {
+        if (res.code === 2000) {
+          this.$message.success('文件上传成功')
+        } else {
+          this.$message.error('文件上传失败')
+        }
         this.$refs.upload.clearFiles()
       })
     },
@@ -291,8 +289,12 @@ export default {
       this.$router.push({ name: 'TaskDetail', params: { id: taskResult.pk }})
     },
     async getSSHResult() {
-      const { time, msg } = await testSSHConn()
-      this.testSSHResult.push([msg, time])
+      const { time, status, msg } = await testSSHConn()
+      this.testSSHResult.push([msg, status, time])
+      // 滚动到窗口底部
+      const container = this.$el.querySelector('.ssh-card')
+      console.log(container.scrollHeight)
+      container.scrollTop = container.scrollHeight
     },
     flushResult() {
       this.timer = setInterval(
@@ -307,6 +309,11 @@ export default {
       }
       this.testSSHResult = []
       this.flushResult()
+      // 滚动到页面最底部
+      this.$nextTick(() => {
+        // window.scrollTo(0,0)
+        window.scrollTo(0, document.documentElement.clientHeight)
+      })
       this.$message({
         message: '开始测试ssh连接',
         type: 'success'
@@ -324,7 +331,7 @@ export default {
         message: '测试已结束',
         type: 'success'
       })
-    },
+    }
     // cleanTestResult() {
     //   this.clean = !this.clean
     // }
@@ -344,5 +351,11 @@ export default {
   width: 480px;
   height: 300px;
   overflow-y: scroll;
+}
+.red-class {
+  color: red;
+}
+.green-class {
+  color: green;
 }
 </style>

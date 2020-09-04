@@ -26,14 +26,14 @@ export function getUsers() {
 export function getInfo() {
   return request({
     url: '/user/info',
-    method: 'get',
+    method: 'get'
   })
 }
 
 export function getTimeLine() {
   return request({
     url: '/user/timeline',
-    method: 'get',
+    method: 'get'
   })
 }
 
@@ -92,10 +92,9 @@ export function forgetPassword(data) {
 export function resendConfirmEmail() {
   return request({
     url: '/resend-confirm-email',
-    method: 'get',
+    method: 'get'
   })
 }
-
 
 export function resetPassword(token, data) {
   return request({

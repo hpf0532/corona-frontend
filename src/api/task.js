@@ -84,7 +84,7 @@ export function distUpload(param, params) {
   return request({
     method: 'post',
     url: '/upload_dist',
-    headers: {'Content-Type':'multipart/form-data'},
+    headers: { 'Content-Type': 'multipart/form-data' },
     data: param,
     params: params
   })
@@ -95,7 +95,7 @@ export function taskCancel(data) {
   return request({
     method: 'post',
     url: '/stop_task',
-    data: data,
+    data: data
   })
 }
 
@@ -103,6 +103,6 @@ export function taskCancel(data) {
 export function testSSHConn() {
   return request({
     method: 'get',
-    url: '/test_ssh',
+    url: '/test_ssh'
   })
 }
