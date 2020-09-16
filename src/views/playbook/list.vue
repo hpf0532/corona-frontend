@@ -104,7 +104,7 @@
               type="primary"
               size="small"
               icon="el-icon-edit"
-              @click="row.edit=!row.edit"
+              @click="handleEdit(row)"
             >
               编辑
             </el-button>
@@ -173,7 +173,26 @@ export default {
       })
       this.listLoading = false
     },
+    handleEdit(row) {
+      for (let i of this.list) {
+        if (i.edit) {
+          return this.$message({
+                message: '请先保存当前编辑项',
+                type: 'error'
+            })
+        }
+      }
+      row.edit=!row.edit
+    },
     createItem() {
+      for (let i of this.list) {
+        if (i.edit) {
+          return this.$message({
+                message: '请先保存当前编辑项',
+                type: 'error'
+            })
+        }
+      }
       this.item = {
         id: '',
         name: '',
@@ -194,6 +213,10 @@ export default {
       this.list.push(this.item)
     },
     cancelEdit(row) {
+      // 新建组未保存过点取消会直接删除
+      if (!row.id) {
+        this.deleteItem(row)
+      }
       row.name = row.originalName
       row.author = row.originalAuthor
       row.information = row.originalInfo
@@ -232,14 +255,6 @@ export default {
       }
     },
     async confirmEdit(row) {
-      if (row.name.trim() === '') {
-        this.$notify({
-          message: 'playbook不能为空',
-          type: 'error',
-          title: '错误'
-        })
-        return
-      }
       if (row.author.trim() === '') {
         this.$notify({
           message: '作者不能为空',
