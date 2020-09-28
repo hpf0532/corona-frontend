@@ -111,7 +111,7 @@
       <el-checkbox style="margin-left:30px" v-model="clean">停止时,清空测试记录</el-checkbox>
       <el-card class="ssh-card">
         <div v-for="line, index in testSSHResult" :key="index">
-          <p :class="line[1]?'green-class':'red-class'">{{ index + 1 }} <span>{{ line[0] }}</span> 用时{{ line[2] }}秒</p>
+          <p :class="line[1]?'green-class':'red-class'">{{ index + 1 }} <span>{{ line[0] }}</span> 用时{{ line[2] }}秒 &nbsp;&nbsp; {{ line[3] | parseTime('{h}:{i}:{s}') }} </p>
         </div>
       </el-card>
     </div>
@@ -289,8 +289,8 @@ export default {
       this.$router.push({ name: 'TaskDetail', params: { id: taskResult.pk }})
     },
     async getSSHResult() {
-      const { time, status, msg } = await testSSHConn()
-      this.testSSHResult.push([msg, status, time])
+      const { time, status, msg, timestamp } = await testSSHConn()
+      this.testSSHResult.push([msg, status, time, timestamp])
       // 滚动到窗口底部
       const container = this.$el.querySelector('.ssh-card')
       console.log(container.scrollHeight)
