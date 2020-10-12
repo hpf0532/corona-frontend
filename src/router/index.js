@@ -391,7 +391,7 @@ export const constantRoutes = [
     },
     children: [
       {
-        path: 'http://10.0.0.225:8080',
+        path: 'http://jenkins.yipurse.com',
         meta: { title: 'Jenkins', icon: 'jenkins' }
       },
       {
