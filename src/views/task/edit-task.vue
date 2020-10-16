@@ -61,12 +61,12 @@
       </el-col>
       <el-col :span="12">
         <div>
-        <el-form-item v-if="isEnv" label="运行环境">
+        <el-form-item v-show="isEnv" label="运行环境">
         <el-switch
           style="display: block;margin-top:10px"
           v-model="taskQuery.env"
-          active-value="2"
-          inactive-value="1"
+          :active-value=2
+          :inactive-value=1
           active-color="#ff4949"
           inactive-color="#13ce66"
           active-text="生产环境"
@@ -95,8 +95,6 @@
       </el-col>
     </el-row>
     
-
-
     <div class="editor-container" style="margin-top:15px">
       <json-editor ref="jsonEditor" v-model="taskForm.extra_vars" />
     </div>
@@ -228,6 +226,7 @@ export default {
       this.optionValue = ''
       this.isEnv = this.playsObj[val].is_env
       this.taskQuery.playbook = val
+      this.taskQuery.env = 1
       this.taskOptions = await getTaskOptions(this.taskQuery)
       if (this.taskOptions.items.length === 0) {
         this.taskOptions = ''

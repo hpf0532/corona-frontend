@@ -4,6 +4,7 @@ import store from '@/store'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import Router from '@/router/index'
 import { resetRouter } from '@/router'
+import { message } from '@/utils/reset-message'
 
 // create an axios instance
 const service = axios.create({
@@ -97,7 +98,7 @@ service.interceptors.response.use(
           break
 
           case 403:
-            Message({
+            message({
               message: errData.message,
               type: 'error',
               duration: 3 * 1000
@@ -117,7 +118,7 @@ service.interceptors.response.use(
             path: '/login',
             query: { redirect: Router.currentRoute.fullPath }
           })
-          Message({
+          message({
             message: errData.message,
             type: 'error',
             duration: 5 * 1000
