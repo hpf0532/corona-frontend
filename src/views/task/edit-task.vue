@@ -48,7 +48,7 @@
     <el-col :span="12">
         <div class="grid-content bg-purple" style="margin-right:20px">
           <el-form-item label="参数列表">
-          <el-select v-model="taskOptions" placeholder="请选择参数" style="width:100%" filterable @change="editOption">
+          <el-select v-model="optionValue" placeholder="请选择参数" style="width:100%" filterable @change="editOption">
               <el-option
                 v-for="item in taskOptions.items"
                 :key="item.id"
@@ -130,7 +130,6 @@ export default {
     return {
       showUpload: false,
       stoken: '',
-      upload: false,
       isEnv: false,
       playItem: '',
       checked: false,
@@ -150,13 +149,14 @@ export default {
       taskOptions: '',
       taskQuery: {
         playbook: undefined,
-        env: undefined
+        env: 1
       },
       fileList: [],
       optName: '',
       testSSHResult: [],
       timer: null,
-      clean: false
+      clean: false,
+      optionValue: null
     }
   },
   created() {
@@ -213,9 +213,11 @@ export default {
     async changeSwitch() {
       this.taskForm.extra_vars = null
       this.taskOptions = ''
+      this.optionValue = ''
       this.taskOptions = await getTaskOptions(this.taskQuery)
       if (this.taskOptions.items.length === 0) {
         this.taskOptions = ''
+        this.optionValue = ''
       }
     },
 
@@ -223,19 +225,21 @@ export default {
       this.taskForm.extra_vars = null
       this.taskQuery.env = undefined
       this.taskOptions = ''
+      this.optionValue = ''
       this.isEnv = this.playsObj[val].is_env
       this.taskQuery.playbook = val
       this.taskOptions = await getTaskOptions(this.taskQuery)
       if (this.taskOptions.items.length === 0) {
         this.taskOptions = ''
+        this.optionValue = ''
       }
       this.taskQuery.env = undefined
 
       // 判断是否需要上传
       if (this.playsObj[val].upload) {
-        this.upload = true
+        this.showUpload = true
       } else {
-        this.upload = false
+        this.showUpload = false
       }
     },
     test(event) {
@@ -252,13 +256,6 @@ export default {
         acc[cur.id] = cur
         return acc
       }, {})
-
-      // 显示上传按钮
-      if (this.upload) {
-        this.showUpload = true
-      } else {
-        this.showUpload = false
-      }
       this.optName = this.taskOptObj[val].name
       this.taskForm.extra_vars = this.taskOptObj[val].content
     },
