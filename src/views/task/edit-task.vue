@@ -154,7 +154,8 @@ export default {
       testSSHResult: [],
       timer: null,
       clean: false,
-      optionValue: null
+      optionValue: null,
+      is_upload: false
     }
   },
   created() {
@@ -178,10 +179,15 @@ export default {
       distUpload(param, query).then(res => {
         if (res.code === 2000) {
           this.$message.success('文件上传成功')
+          this.is_upload = true
         } else {
           this.$message.error('文件上传失败')
+          this.$refs.upload.clearFiles()
+          this.is_upload = false
         }
+      }).catch(err => {
         this.$refs.upload.clearFiles()
+        this.is_upload = false
       })
     },
     fetchStoken() {
@@ -266,6 +272,8 @@ export default {
           message: '请打开锁',
           type: 'error'
         })
+        // 重新获取stoken
+        this.fetchStoken()
         return false
       }
       console.log(this.taskForm.extra_vars)
@@ -280,8 +288,11 @@ export default {
         hosts: this.taskForm.hosts,
         playbook: this.taskForm.playbook,
         option: this.taskForm.options,
-        extra_vars: this.taskForm.extra_vars
-      }, params)
+        extra_vars: this.taskForm.extra_vars,
+        is_upload: this.is_upload
+      }, params).catch(err => {
+        this.fetchStoken()
+      })
       this.$router.push({ name: 'TaskDetail', params: { id: taskResult.pk }})
     },
     async getSSHResult() {
