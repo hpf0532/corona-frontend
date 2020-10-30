@@ -224,6 +224,7 @@ export default {
     },
     // 上传失败钩子
     handleUploadFailed(err, file, fileList) {
+      console.log(err)
       this.errObj = JSON.parse(err.message)
       this.$message.error(this.errObj.message)
       this.is_upload = false
