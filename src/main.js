@@ -37,10 +37,11 @@ import { message } from './utils/reset-message'
 
 Vue.prototype.$qs = qs
 
-if (process.env.NODE_ENV === 'production') {
-  const { mockXHR } = require('../mock')
-  mockXHR()
-}
+// 该设置影响上传组件展示进度条
+// if (process.env.NODE_ENV === 'production') {
+//   const { mockXHR } = require('../mock')
+//   mockXHR()
+// }
 
 // set ElementUI lang to EN
 // Vue.use(ElementUI, { locale })
