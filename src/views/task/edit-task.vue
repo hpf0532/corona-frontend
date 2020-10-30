@@ -85,8 +85,14 @@
             v-if="showUpload"
             ref="upload"
             class="upload-demo"
-            action="https://jsonplaceholder.typicode.com/posts/"
-            :http-request = "customUpload"
+            :limit="1"
+            :headers="setToken()"
+            :action="getURL()"
+            :before-upload="beforeUpload"
+            :before-remove="beforeRemove"
+            :on-exceed="handleExceed"
+            :on-success="handleUploadSuccess"
+            :on-error="handleUploadFailed"
             :file-list="fileList">
             <el-button size="small" type="primary">点击上传</el-button>
             <div slot="tip" class="el-upload__tip">只能上传.zip文件</div>
@@ -117,6 +123,8 @@
   </div>
 </template>
 <script>
+import store from '@/store'
+import { getToken } from '@/utils/auth'
 import JsonEditor from '@/components/JsonEditor'
 import { hostGroupSelect, getPlayBooks } from '@/api/inventory'
 import { submitTask, getTaskOptions, distUpload, testSSHConn } from '@/api/task'
@@ -155,7 +163,8 @@ export default {
       timer: null,
       clean: false,
       optionValue: null,
-      is_upload: false
+      is_upload: false,
+      errObj: null
     }
   },
   created() {
@@ -170,6 +179,55 @@ export default {
     }
   },
   methods: {
+    // 设置请求头中的token
+    setToken() {
+      if (store.getters.token) {
+        return {'X-Token': getToken()}
+      }
+    },
+    // 返回文件上传地址
+    getURL() {
+      return process.env.VUE_APP_BASE_API + "upload_dist" + "?option=" + this.optName
+    },
+    // 上传之前判断文件名
+    beforeUpload(file) {
+      // 先选择参数才可上传
+      if(!this.optName) {
+        this.$message.error('请先选择参数')
+        return false
+      }
+      // 判断文件名后缀是否为.zip
+      let fileArr = file.name.split(".")
+      let suffix = fileArr[fileArr.length - 1]
+      if(suffix != "zip") {
+        this.$message.error('请上传zip文件')
+        return false
+      }
+    },
+    // 删除文件之前的钩子
+    beforeRemove(file, fileList) {
+      this.is_upload = false
+    },
+    // 文件超出个数限制时的钩子
+    handleExceed(files, fileList) {
+      this.$message.warning("当前限制选择 1 个文件")
+    },
+    // 上传成功钩子
+    handleUploadSuccess(res, file, fileList) {
+      if (res.code === 2000) {
+        this.$message.success('文件上传成功')
+        this.is_upload = true
+      } else {
+        this.$message.error('文件上传失败')
+        this.is_upload = false
+      }
+    },
+    // 上传失败钩子
+    handleUploadFailed(err, file, fileList) {
+      this.errObj = JSON.parse(err.message)
+      this.$message.error(this.errObj.message)
+      this.is_upload = false
+    },
     customUpload(file) {
       // this.generatorFileMd5(file.file)
       // 自定义上传
