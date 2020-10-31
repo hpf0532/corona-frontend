@@ -86,13 +86,11 @@
             ref="upload"
             class="upload-demo"
             :limit="1"
-            :headers="setToken()"
-            :action="getURL()"
+            action="sdf"
+            :http-request="customUpload"
             :before-upload="beforeUpload"
             :before-remove="beforeRemove"
             :on-exceed="handleExceed"
-            :on-success="handleUploadSuccess"
-            :on-error="handleUploadFailed"
             :file-list="fileList">
             <el-button size="small" type="primary">点击上传</el-button>
             <div slot="tip" class="el-upload__tip">只能上传.zip文件</div>
