@@ -242,6 +242,7 @@ export default {
           this.is_upload = false
         }
       }).catch(err => {
+        print(err)
         this.$refs.upload.clearFiles()
         this.is_upload = false
       })
