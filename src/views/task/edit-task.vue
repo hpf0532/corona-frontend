@@ -233,6 +233,7 @@ export default {
       param.append('files', file.file)
       const query = { 'option': this.optName }
       distUpload(param, query).then(res => {
+        console.log(res)
         if (res.code === 2000) {
           this.$message.success('文件上传成功')
           this.is_upload = true
