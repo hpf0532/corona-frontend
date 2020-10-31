@@ -88,7 +88,6 @@
             :limit="1"
             action="sdf"
             :http-request="customUpload"
-            :before-upload="beforeUpload"
             :before-remove="beforeRemove"
             :on-exceed="handleExceed"
             :file-list="fileList">
