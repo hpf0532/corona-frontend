@@ -85,9 +85,9 @@ export function distUpload(param, params) {
     method: 'post',
     url: '/upload_dist',
     headers: { 'Content-Type': 'multipart/form-data' },
-    // onUploadProgress: Event => {
-    //   console.log(Event)
-    // },
+    onUploadProgress: Event => {
+      console.log(Event)
+    },
     data: param,
     params: params
   })
