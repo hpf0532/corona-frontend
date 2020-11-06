@@ -40,6 +40,20 @@
           </td>
         </tr>
         <tr>
+          <td class="t-title">任务进度</td>
+          <td class="t-body" style="padding:12px">
+            <div v-if="progress">
+              <el-progress 
+                :text-inside="true" 
+                :stroke-width="26"
+                :style="primary"
+                :status="task_status"
+                :percentage="percentage">
+              </el-progress>
+            </div>
+          </td>
+        </tr>
+        <tr>
           <td class="t-title">AnsibleResult
             </br>
             <el-button
@@ -100,7 +114,10 @@ export default {
       buttonStatus: false,
       celeryStatus: false,
       cancelled: false,
-      timer: null
+      timer: null,
+      percentage: 0,
+      progress: false,
+      task_status: ''
     }
   },
   mounted() {
@@ -122,6 +139,9 @@ export default {
       this.taskDetail = await getTaskDetail(this.id)
       this.extraVars = this.taskDetail.extra_vars
       this.cancelled = this.taskDetail.cancelled
+      this.progress = this.taskDetail.progress
+      this.percentage = this.taskDetail.percentage
+      this.task_status = this.taskDetail.task_status
 
       this.ansibleResult = this.taskDetail.ansible_result
       // 关闭轮询按钮
@@ -141,9 +161,12 @@ export default {
       this.dataLoading = false
     },
     async getResult() {
-      const { ansible_result, celery_result, cancelled } = await flushTask(this.id)
+      const { ansible_result, celery_result, cancelled, progress, percentage, task_status } = await flushTask(this.id)
       this.ansibleResult = ansible_result
       this.cancelled = cancelled
+      this.progress = progress
+      this.percentage = percentage
+      this.task_status = task_status
       // 关闭轮询按钮
       if (this.ansibleResult) {
         this.buttonStatus = true
