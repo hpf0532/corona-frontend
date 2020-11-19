@@ -26,21 +26,20 @@
           <svg-icon icon-class="capcha" />
         </span>
         <span>
-        <el-input
-          ref="capcha"
-          v-model="forgetForm.capcha"
-          placeholder="验证码"
-          name="capcha"
-          type="text"
-          tabindex="1"
-          auto-complete="on"
-        />
+          <el-input
+            ref="capcha"
+            v-model="forgetForm.capcha"
+            placeholder="验证码"
+            name="capcha"
+            type="text"
+            tabindex="1"
+            auto-complete="on"
+          />
         </span>
       </el-form-item>
       <span style="float:right">
-        <img @click="fetchCapcha" style="margin-top:8px" :src="capchaImg" alt="">
+        <img style="margin-top:8px" :src="capchaImg" alt="" @click="fetchCapcha">
       </span>
-
 
       <el-button :loading="loading" type="primary" :disabled="!canClick" style="width:100%;margin-bottom:10px;" @click.native.prevent="handlerForgetPass">{{ content }}</el-button>
 
@@ -78,27 +77,27 @@ export default {
     return {
       forgetForm: {
         email: '',
-        capcha:'',
+        capcha: '',
         capcha_id: ''
       },
       capchaImg: '',
       forgetRules: {
         email: [{ required: true, trigger: 'blur', validator: validateEmail }],
-        capcha: [{ required: true, trigger: 'blur', validator: validateCapcha }],
+        capcha: [{ required: true, trigger: 'blur', validator: validateCapcha }]
       },
       loading: false,
       redirect: undefined,
 
       content: '发送重置密码邮件',
       totalTime: 60,
-      canClick: true  //添加canClick
+      canClick: true // 添加canClick
     }
   },
   created() {
     this.fetchCapcha()
   },
   methods: {
-    async fetchCapcha(){
+    async fetchCapcha() {
       const data = await getCapcha()
       this.capchaImg = data.img
       this.forgetForm.capcha_id = data.img_id
@@ -106,26 +105,26 @@ export default {
     handlerForgetPass() {
       this.$refs.forgetForm.validate(valid => {
         if (valid) {
-            if (!this.canClick) return   //改动的是这两行代码
-                this.canClick = false
-                this.content = this.totalTime + 's后重新发送'
-                let clock = window.setInterval(() => {
-                  this.totalTime--
-                  this.content = this.totalTime + 's后重新发送'
-                  if (this.totalTime < 0) {
-                    window.clearInterval(clock)
-                    this.content = '重新发送邮件'
-                    this.totalTime = 60
-                    this.canClick = true   //这里重新开启
-                  }
-                },1000)
+          if (!this.canClick) return // 改动的是这两行代码
+          this.canClick = false
+          this.content = this.totalTime + 's后重新发送'
+          const clock = window.setInterval(() => {
+            this.totalTime--
+            this.content = this.totalTime + 's后重新发送'
+            if (this.totalTime < 0) {
+              window.clearInterval(clock)
+              this.content = '重新发送邮件'
+              this.totalTime = 60
+              this.canClick = true // 这里重新开启
+            }
+          }, 1000)
           this.loading = true
           forgetPassword(this.forgetForm).then(response => {
             const data = response
             this.$message({
-                showClose: true,
-                message: data.message,
-                type: 'success'
+              showClose: true,
+              message: data.message,
+              type: 'success'
             })
             // this.$router.push({path: '/login'})
             // console.log(data)
@@ -141,7 +140,7 @@ export default {
           return false
         }
       })
-    },
+    }
     // handleLogin() {
     //   this.$refs.forgetForm.validate(valid => {
     //     if (valid) {
@@ -150,7 +149,7 @@ export default {
     //     } else {
     //     }
     //   }
-    }
+  }
 }
 
 </script>

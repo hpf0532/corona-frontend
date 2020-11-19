@@ -10,11 +10,11 @@ export function getStoken() {
 
 // 获取分类列表接口
 export function getCategorys() {
-    return request({
-      url: '/categorys',
-      method: 'get'
-    })
-  }
+  return request({
+    url: '/categorys',
+    method: 'get'
+  })
+}
 
 // 创建分类接口
 export function createCategory(data) {
@@ -23,7 +23,7 @@ export function createCategory(data) {
     method: 'post',
     data
   })
-}  
+}
 
 // 删除分类接口
 export function deleteCategory(id) {
@@ -69,7 +69,6 @@ export function getPostDetail(id) {
   })
 }
 
-
 // 编辑文章接口
 export function editPost(id, data) {
   return request({
@@ -90,7 +89,7 @@ export function deletePost(id) {
 // 获取草稿接口
 export function getDrafts() {
   return request({
-    url: "/drafts",
+    url: '/drafts',
     method: 'get'
   })
 }

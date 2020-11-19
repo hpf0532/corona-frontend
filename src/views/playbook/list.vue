@@ -174,23 +174,23 @@ export default {
       this.listLoading = false
     },
     handleEdit(row) {
-      for (let i of this.list) {
+      for (const i of this.list) {
         if (i.edit) {
           return this.$message({
-                message: '请先保存当前编辑项',
-                type: 'error'
-            })
+            message: '请先保存当前编辑项',
+            type: 'error'
+          })
         }
       }
-      row.edit=!row.edit
+      row.edit = !row.edit
     },
     createItem() {
-      for (let i of this.list) {
+      for (const i of this.list) {
         if (i.edit) {
           return this.$message({
-                message: '请先保存当前编辑项',
-                type: 'error'
-            })
+            message: '请先保存当前编辑项',
+            type: 'error'
+          })
         }
       }
       this.item = {

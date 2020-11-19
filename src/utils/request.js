@@ -97,13 +97,13 @@ service.interceptors.response.use(
           })
           break
 
-          case 403:
-            message({
-              message: errData.message,
-              type: 'error',
-              duration: 3 * 1000
-            })
-            break
+        case 403:
+          message({
+            message: errData.message,
+            type: 'error',
+            duration: 3 * 1000
+          })
+          break
         case 404:
           Router.push({ path: '/error/404' })
           break

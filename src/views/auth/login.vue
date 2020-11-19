@@ -45,19 +45,19 @@
           <svg-icon icon-class="capcha" />
         </span>
         <span>
-        <el-input
-          ref="capcha"
-          v-model="loginForm.capcha"
-          placeholder="验证码"
-          name="capcha"
-          type="text"
-          tabindex="1"
-          auto-complete="on"
-        />
+          <el-input
+            ref="capcha"
+            v-model="loginForm.capcha"
+            placeholder="验证码"
+            name="capcha"
+            type="text"
+            tabindex="1"
+            auto-complete="on"
+          />
         </span>
       </el-form-item>
       <span style="float:right">
-        <img @click="fetchCapcha" style="margin-top:8px" :src="capchaImg" alt="">
+        <img style="margin-top:8px" :src="capchaImg" alt="" @click="fetchCapcha">
       </span>
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:10px;" @click.native.prevent="handleLogin">登录</el-button>
@@ -110,16 +110,16 @@ export default {
       loginForm: {
         username: '',
         password: '',
-        capcha:'',
+        capcha: '',
         capcha_id: ''
       },
       // capchaImg: "data:image/png;base64," + 'iVBORw0KGgoAAAANSUhEUgAAALQAAAAoCAIAAADYC0ddAAAHJElEQVR4nO2aeXAT1x3Hf7u6duXVffjCjmSDkxRzpOUwKVBcCDTEOaZpxp1Qpsk0Lc2d0HacNGkzZCaUQjtlMkOOSTrTtOkfnjixKQw5ShtjEmK7mELMYSOMbXCEhGxZK6+00kq72z82FartbTrVWzsw7/PX7/3e0/u+P77v7TtEmNvHAYOZDnK2B4D58oLNgVEFmwOjCjYHRhVsDowq2BwYVa4Fc5iEc8bMyGyP4hpEP9sDKBQX+4Zjog0AJsxrws7HZ3s4mkMFY+bhKJnOZi2ULinIOjIx15P2WrTQurrNYcxcdEz8RYktyXbOvDJBfW12h6QpN/xyn+vwuan5jJ1mb6ocWz13bGW1rNehkru6zWHn2gCkXFEvjs7eWDTHwPKTnUFAxmY2sLwhxrs/7Hd/2J8qswea1scXliNR1M4cMimmJR2lWf9ASklL8qNcUSQZjv66dnKzTsZKR2+udh4ZkElCLDJlGdPpHXfxlU5ClKgg6/nrmbK3/0kFY7VPvnX2mVtHv3l94YoEqrcVc+xMWd8eQzpKirwumzCkRglZjHvqIr7vjJeuBQL9zpcS+udcfipXDLmaOLoOucp/4cFDf3Ylxl+49WGZIGZM1NE1aB6Khu5cKFKGSVWmcLx269tUMJb2Wo42P1C4FpqVo3jgzYreHYQsZkyuk+v2GVIRJnrCOXLAFu6whTs45+LAipeyRgcSrRymzFAuTtDLZtgZm7r2/qZlOwAcqK0/Vjl/xnT9ew7RF8eZs+H+X2ycVJUutrI3zaGCMQPLI9FCYA5rpLPy0+0AslIU9Zas1cFbayK+e5joCX9PExM97u95OrDilcK1chTx3Y54ixJn9MWXHY8g7PwLcSZiv2rbpcQbTnWsDnQx6aQjwUoEed5T+W7tN4Zcc7TQ1XNp+uI4ALjazxoeq8/Y6FyVeXDMv6fd3nMBANjFFWjkCu+iovfXOWecX/pbmbzSJ+dcFFjx8oKDDfbQISMfEuiSwuUUrMm/KdtPQV8e9GwTSU3Ocmo8t/9FFzcOADJB3PdJiyPBFglXJuv21l3PNzz6u3U/QK4rk59/vwhJtpy6FL25CgCoYKziT93e90+DLANBjK6pGfrRSiRyhZqDnhgws31KHCupj3uWT2qQYvycczEzdsyY/AyhOcYtdxfx3Ql6WdjxuESaUXX7v+AfHbnvSAsAvLbquyfLal5f2QgARQJfEQ3eGBrYcKpjc2frzz54TQtzkIKYi82Do5JBV3zgpKsjQEhyssodqa+J3HJjutiKSq5QczBjPbn40vVbpm0jUMUAIBpQTu6szgkAUWvjVGeYhHNZvUckbQjl8vn5uy/pJbHbt2jrPc9I/95oJ4x0X0l1X0n1e/NXb+5slVBvwF0fDYAsE+KVc/t1r3+cKrPHa0sHH1kzvtyXKrOjVQQkK4cSJBy1nHPRdE1kM3ta1DMpS3WBWvmQUhIApnWAm30j5PopQq18SuKRxqP7AaDp7qZpHfC9zjYAaF5yG1rd5HXOspZjhtiVj9fIpmXDD2h7dC/UHCbuohKMzbl92gbOkQMUNxye+32ZQHZzBwCknAIAkZy8hDJ8Jylx2i0bd5w4qJPEw/OWdvummQn1/Z/saN15qqzmuTueQKvLVzgGnlxrCsVdHQElI+s1fxcrVIAUk0ow4V4ytdYa6fQd3yaYSz+74eEChSYjiwBAgJifo4RAcXT3RNFaxFp5LBnuBYC2xesn5elMatu+3a0v//hY5fyNj/6eMxVpN4YZo9CVQ9J9fpoSzP9xZUvIYsm5P5Sf3i3qmbMrXkW74QAAiaQBwJAZSRvnKhk63Vs6tkMkmbiW5ihhIwAQ8PpyGb0k3tu9t+m9V0vZyzs3bNm5YUuWRLlG5pN/gSGZNH/6KFQgxfiUwN/z1IWFT2cor5G/ZAsd9g41UxPnU5aqQN2eXBuEZHVeGXQu9s1R+/2kzFuSh2zcBxJJBd3PSgT9xb//fzGKGQBoPLpfBvBw0eWDx+88frAkHjlS/dW7Hnol4PVrJw0AyiWHQgrdqUSNQs0R8Te6h9/RZ+L2ULs91J7Ly4QuXL15ZP5WjZ5XJNLMmVdZku2V4SeUjKizB13PCgafFnI52mvqVgX+salr76auvUrmks370L3P/7Hu2zNwiU5fiOZivgLxjfNUEKwcZ9Y0V376gi38sXIVJulM0fKNoXn389Z5KEaoymXHg4K+vCh1lJCFBF3HMt+auj9Fzq71P8ySuobev1tTXH9x1ftfWdW8tIE3aPi+mI8ulVECyaRP+l1ayyF7eDPyYWNyJEN5Bbo0/5IUgxCmL7zgsWYyI4YaFgz8ZJ3WcsjMgZkZjKOcgeUTVR7Q/iUYT/GrDMHNCG5mZrSuhT8YYzQCmwOjCjYHRhVsDowq2BwYVbA5MKpgc2BUwebAqILNgVEFmwOjCjYHRhVsDowq/wI7HZkPi6TnFwAAAABJRU5ErkJggg==',
       capchaImg: '',
-      
+
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateEmail }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }],
-        capcha: [{ required: true, trigger: 'blur', validator: validateCapcha }],
+        capcha: [{ required: true, trigger: 'blur', validator: validateCapcha }]
       },
       loading: false,
       passwordType: 'password',
@@ -138,7 +138,7 @@ export default {
     this.fetchCapcha()
   },
   methods: {
-    async fetchCapcha(){
+    async fetchCapcha() {
       const data = await getCapcha()
       this.capchaImg = data.img
       this.loginForm.capcha_id = data.img_id

@@ -75,19 +75,19 @@
           <svg-icon icon-class="capcha" />
         </span>
         <span>
-        <el-input
-          ref="capcha"
-          v-model="registerForm.capcha"
-          placeholder="验证码"
-          name="capcha"
-          type="text"
-          tabindex="1"
-          auto-complete="on"
-        />
+          <el-input
+            ref="capcha"
+            v-model="registerForm.capcha"
+            placeholder="验证码"
+            name="capcha"
+            type="text"
+            tabindex="1"
+            auto-complete="on"
+          />
         </span>
       </el-form-item>
       <span style="float:right">
-        <img @click="fetchCapcha" style="margin-top:8px" :src="capchaImg" alt="">
+        <img style="margin-top:8px" :src="capchaImg" alt="" @click="fetchCapcha">
       </span>
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleRegister">注册</el-button>
@@ -190,7 +190,7 @@ export default {
         ],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }],
         password2: [{ required: true, trigger: 'blur', validator: validatePass2 }],
-        capcha: [{ required: true, trigger: 'blur', validator: validateCapcha }],
+        capcha: [{ required: true, trigger: 'blur', validator: validateCapcha }]
 
       },
       loading: false,
@@ -210,7 +210,7 @@ export default {
     this.fetchCapcha()
   },
   methods: {
-    async fetchCapcha(){
+    async fetchCapcha() {
       const data = await getCapcha()
       this.capchaImg = data.img
       this.registerForm.capcha_id = data.img_id

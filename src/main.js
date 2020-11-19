@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import  qs from 'qs'
+import qs from 'qs'
 
 // import "bootstrap/dist/css/bootstrap.min.css"
 
@@ -49,7 +49,7 @@ Vue.prototype.$qs = qs
 Vue.use(ElementUI)
 Vue.use(VueHighlightJS)
 
-Vue.prototype.$message = message;
+Vue.prototype.$message = message
 
 // register global utility filters
 Object.keys(filters).forEach(key => {

@@ -8,10 +8,10 @@
       <el-input v-model="listQuery.name" placeholder="配置名" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-select v-model="listQuery.playbook" placeholder="playbook" clearable class="filter-item" style="width: 130px">
         <el-option v-for="item in playbookList" :key="item.id" :label="item.name" :value="item.id" />
-      </el-select> 
+      </el-select>
       <el-select v-model="listQuery.env" placeholder="环境配置" clearable class="filter-item" style="width: 130px">
         <el-option v-for="item in envList" :key="item.id" :label="item.name" :value="item.id" />
-      </el-select>   
+      </el-select>
       <el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter">
         <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" />
       </el-select>
@@ -158,7 +158,7 @@ export default {
         { label: 'ID Ascending', key: '+id' },
         { label: 'ID Descending', key: '-id' }
       ],
-      dialogWidth:"65%",
+      dialogWidth: '65%',
       list: null,
       listLoading: true,
       total: 0,
@@ -190,7 +190,7 @@ export default {
       },
       rules: {
         name: [{ required: true, message: '参数名必填', trigger: 'change' }],
-        playbook: [{ required: true, message: '请选择PlayBook',  trigger:'change' }]
+        playbook: [{ required: true, message: '请选择PlayBook', trigger: 'change' }]
 
       }
     }
@@ -286,11 +286,10 @@ export default {
           const createData = {
             name: name.trim(),
             playbook_id: playbook,
-            env_id: env?env:null,
+            env_id: env || null,
             content: JSON.parse(content),
-            url: url?url:null
-            }
-          
+            url: url || null
+          }
 
           console.log(createData)
           createOptions(createData).then((response) => {
@@ -311,22 +310,22 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          let { id, name, playbook, env, content, url } = this.temp
+          const { id, name, playbook, env, content, url } = this.temp
 
           try {
             var content_json = JSON.parse(content)
-          } catch(e) {
+          } catch (e) {
             content_json = content
           }
 
           var editData = {
             name: name.trim(),
             playbook_id: playbook,
-            env_id: env?env:null,
-            url: url?url:null,
-            content: content_json,
+            env_id: env || null,
+            url: url || null,
+            content: content_json
           }
-          
+
           updateOptions(id, editData).then((response) => {
             const index = this.list.findIndex(v => v.id === this.temp.id)
             this.list.splice(index, 1, response)

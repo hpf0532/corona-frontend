@@ -3,9 +3,9 @@
     <el-timeline>
       <el-timeline-item v-for="(item,index) of timeline" :key="index" :timestamp="item.create_time | parseTime('{y}/{m}/{d}')" placement="top">
         <el-card>
-            <router-link :to="'/inventory/task/detail/'+item.id" class="link-type">
-              <h4>{{ item.ansible_id }}</h4>
-            </router-link>
+          <router-link :to="'/inventory/task/detail/'+item.id" class="link-type">
+            <h4>{{ item.ansible_id }}</h4>
+          </router-link>
           <p>{{ item.user }} executed {{ item.playbook }} at {{ item.create_time | parseTime('{y}/{m}/{d} {h}:{i}') }}</p>
         </el-card>
       </el-timeline-item>

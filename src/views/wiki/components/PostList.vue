@@ -1,45 +1,45 @@
 <template>
-    <div class="post-list">
-        <div v-if="postList.count">
-        <div v-for="item in postList.items" class="post-container">
-            <div class="user-block">
-                <img class="img-circle" :src="item.avatar+avatarPrefix">
-                <span class="username text-muted">{{ item.author }}</span>
-                <span class="description">发布于: {{ item.create_time | parseTime('{y}-{m}-{d}') }}</span>
-            </div>
-            <div class="post">
-                <div class="title">
-                    <router-link :to="'/wiki/posts/detail/'+item.id" class="link-type">
-                        <h2>{{ item.title }}</h2>
-                    </router-link>
-                </div>
-                <div class="summary">
-                    <p>{{ item.desc }}</p>
-                </div>
-                <div v-if="isAuthor" class="action fr">
-                    <router-link :to="'/wiki/posts/edit/'+item.id" class="action-type">
-                        编辑
-                    </router-link>
-                    <el-button class="delete" type="text" @click="handleDelete(item.id)">删除</el-button>
-                </div>
-            </div>
-            <hr>
+  <div class="post-list">
+    <div v-if="postList.count">
+      <div v-for="item in postList.items" class="post-container">
+        <div class="user-block">
+          <img class="img-circle" :src="item.avatar+avatarPrefix">
+          <span class="username text-muted">{{ item.author }}</span>
+          <span class="description">发布于: {{ item.create_time | parseTime('{y}-{m}-{d}') }}</span>
         </div>
-        </div>
-        <div class="none-post" v-else>
-            还没有文章哦 
-            <router-link class="link-create" to="/wiki/posts/create">
-                动手写一篇
+        <div class="post">
+          <div class="title">
+            <router-link :to="'/wiki/posts/detail/'+item.id" class="link-type">
+              <h2>{{ item.title }}</h2>
             </router-link>
+          </div>
+          <div class="summary">
+            <p>{{ item.desc }}</p>
+          </div>
+          <div v-if="isAuthor" class="action fr">
+            <router-link :to="'/wiki/posts/edit/'+item.id" class="action-type">
+              编辑
+            </router-link>
+            <el-button class="delete" type="text" @click="handleDelete(item.id)">删除</el-button>
+          </div>
         </div>
-        <pagination
-        v-show="total>0"
-        :total="total"
-        :page.sync="filterQuery.page"
-        :limit.sync="filterQuery.limit"
-        @pagination="fetchPosts"
-        />
+        <hr>
+      </div>
     </div>
+    <div v-else class="none-post">
+      还没有文章哦
+      <router-link class="link-create" to="/wiki/posts/create">
+        动手写一篇
+      </router-link>
+    </div>
+    <pagination
+      v-show="total>0"
+      :total="total"
+      :page.sync="filterQuery.page"
+      :limit.sync="filterQuery.limit"
+      @pagination="fetchPosts"
+    />
+  </div>
 </template>
 <script>
 const avatarPrefix = '?imageView2/1/w/80/h/80'
@@ -48,55 +48,55 @@ import { parseTime } from '@/utils'
 import { deletePost } from '@/api/wiki'
 import Pagination from '@/components/Pagination'
 export default {
-    components: { Pagination },
-    props: {
-        query: {
-        type: Object,
-        default: () => {
-            return {
-                page: 1,
-                limit: 20,
-            }
-        }
-        },
-        isAuthor: {
-            type: Boolean,
-            default: false
-        }
-    },
-    data() {
+  components: { Pagination },
+  props: {
+    query: {
+      type: Object,
+      default: () => {
         return {
-            avatarPrefix
+          page: 1,
+          limit: 20
         }
+      }
     },
-    computed: {
-        ...mapGetters([
-        'postList',
-        'total',
-        'filterQuery',
-        'uid'
-        ]),
+    isAuthor: {
+      type: Boolean,
+      default: false
+    }
+  },
+  data() {
+    return {
+      avatarPrefix
+    }
+  },
+  computed: {
+    ...mapGetters([
+      'postList',
+      'total',
+      'filterQuery',
+      'uid'
+    ])
+  },
+  watch: {
+    filterQuery: {
+      handler(newName, oldName) {
+        this.fetchPosts()
+      },
+      // 页面中处理
+      // immediate: true,
+      deep: true
+    }
+  },
+  created() {
+  },
+  methods: {
+    fetchPosts() {
+      this.$store.dispatch('wiki/getPosts', this.filterQuery).then(response => {
+        // this.total = this.postList.count
+      }).catch(e => {
+        console.log(e)
+      })
     },
-    created() {
-    },
-    watch: {
-        filterQuery: {
-            handler(newName, oldName){
-                this.fetchPosts()
-            },
-            // 页面中处理
-            // immediate: true,
-            deep: true
-        }
-    },
-    methods: {
-        fetchPosts() {
-            this.$store.dispatch('wiki/getPosts', this.filterQuery).then(response => {
-                // this.total = this.postList.count
-            }).catch(e => {
-                console.log(e)
-            })
-        },
     async handleDelete(id) {
       await this.$confirm('确认删除这篇文档?', '提示', {
         confirmButtonText: '确定',
@@ -104,7 +104,6 @@ export default {
         type: 'error'
       }).then(() => {
         deletePost(id).then(data => {
-
           this.$store.dispatch('wiki/getPosts', this.filterQuery)
           this.$message({
             type: 'success',
@@ -121,7 +120,7 @@ export default {
         })
       })
     }
-    }
+  }
 }
 </script>
 <style lang="scss" scoped>

@@ -5,114 +5,115 @@
     </div>
 
     <el-form ref="taskForm" :model="taskForm" label-width="80px" :label-position="labelPosition">
-    <el-row>
-      <el-col :span="12">
-        <div class="grid-content bg-purple" style="margin-right:20px">
-          <el-form-item label="主机列表">
-          <el-select v-model="taskForm.hosts" multiple placeholder="请选择主机" style="width:100%">
-            <el-option-group
-              class="group"
-              v-for="group in list"
-              :key="group.group_id"
-              :label="group.group_name"
-              @click.native="test">
-              <el-option
-                v-for="item in group.hosts"
-                :key="item.host_id"
-                :label="item.hostname"
-                :value="item.host_id">
-              </el-option>
-            </el-option-group>
-          </el-select>
-        </el-form-item>
-        </div>
-      </el-col>
-      <el-col :span="12">
-        <div class="grid-content bg-purple-light" style="margin-right:20px">
-          <el-form-item label="PlayBook列表">
-          <el-select v-model="taskForm.playbook" placeholder="请选择playbook" style="width:100%" @change="getPlayOptions">
-            <el-option
-              v-for="item in playbooks"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-              :item="playItem">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        </div>
-      </el-col>
-    </el-row>
+      <el-row>
+        <el-col :span="12">
+          <div class="grid-content bg-purple" style="margin-right:20px">
+            <el-form-item label="主机列表">
+              <el-select v-model="taskForm.hosts" multiple placeholder="请选择主机" style="width:100%">
+                <el-option-group
+                  v-for="group in list"
+                  :key="group.group_id"
+                  class="group"
+                  :label="group.group_name"
+                  @click.native="test"
+                >
+                  <el-option
+                    v-for="item in group.hosts"
+                    :key="item.host_id"
+                    :label="item.hostname"
+                    :value="item.host_id"
+                  />
+                </el-option-group>
+              </el-select>
+            </el-form-item>
+          </div>
+        </el-col>
+        <el-col :span="12">
+          <div class="grid-content bg-purple-light" style="margin-right:20px">
+            <el-form-item label="PlayBook列表">
+              <el-select v-model="taskForm.playbook" placeholder="请选择playbook" style="width:100%" @change="getPlayOptions">
+                <el-option
+                  v-for="item in playbooks"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                  :item="playItem"
+                />
+              </el-select>
+            </el-form-item>
+          </div>
+        </el-col>
+      </el-row>
 
-    <el-row>
-    <el-col :span="12">
-        <div class="grid-content bg-purple" style="margin-right:20px">
-          <el-form-item label="参数列表">
-          <el-select v-model="optionValue" placeholder="请选择参数" style="width:100%" filterable @change="editOption">
-              <el-option
-                v-for="item in taskOptions.items"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id">
-              </el-option>
-          </el-select>
-        </el-form-item>
-        </div>
-      </el-col>
-      <el-col :span="12">
-        <div>
-        <el-form-item v-show="isEnv" label="运行环境">
-        <el-switch
-          style="display: block;margin-top:10px"
-          v-model="taskQuery.env"
-          :active-value=2
-          :inactive-value=1
-          active-color="#ff4949"
-          inactive-color="#13ce66"
-          active-text="生产环境"
-          inactive-text="测试环境"
-          @change="changeSwitch"
-          >
-        </el-switch>
-        </el-form-item>
+      <el-row>
+        <el-col :span="12">
+          <div class="grid-content bg-purple" style="margin-right:20px">
+            <el-form-item label="参数列表">
+              <el-select v-model="optionValue" placeholder="请选择参数" style="width:100%" filterable @change="editOption">
+                <el-option
+                  v-for="item in taskOptions.items"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                />
+              </el-select>
+            </el-form-item>
+          </div>
+        </el-col>
+        <el-col :span="12">
+          <div>
+            <el-form-item v-show="isEnv" label="运行环境">
+              <el-switch
+                v-model="taskQuery.env"
+                style="display: block;margin-top:10px"
+                :active-value="2"
+                :inactive-value="1"
+                active-color="#ff4949"
+                inactive-color="#13ce66"
+                active-text="生产环境"
+                inactive-text="测试环境"
+                @change="changeSwitch"
+              />
+            </el-form-item>
+          </div>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <div>
+            <el-upload
+              v-if="showUpload"
+              ref="upload"
+              class="upload-demo"
+              :limit="1"
+              :headers="setToken()"
+              :action="getURL()"
+              :before-upload="beforeUpload"
+              :before-remove="beforeRemove"
+              :on-exceed="handleExceed"
+              :on-success="handleUploadSuccess"
+              :on-error="handleUploadFailed"
+              :file-list="fileList"
+            >
+              <el-button size="small" type="primary">点击上传</el-button>
+              <div slot="tip" class="el-upload__tip">只能上传.zip文件</div>
+            </el-upload>
+          </div>
+        </el-col>
+      </el-row>
+
+      <div class="editor-container" style="margin-top:15px">
+        <json-editor ref="jsonEditor" v-model="taskForm.extra_vars" />
       </div>
-      </el-col>
-    </el-row>
-    <el-row>
-      <el-col :span="12">
-        <div>
-          <el-upload
-            v-if="showUpload"
-            ref="upload"
-            class="upload-demo"
-            :limit="1"
-            :headers="setToken()"
-            :action="getURL()"
-            :before-upload="beforeUpload"
-            :before-remove="beforeRemove"
-            :on-exceed="handleExceed"
-            :on-success="handleUploadSuccess"
-            :on-error="handleUploadFailed"
-            :file-list="fileList">
-            <el-button size="small" type="primary">点击上传</el-button>
-            <div slot="tip" class="el-upload__tip">只能上传.zip文件</div>
-          </el-upload>
-        </div>
-      </el-col>
-    </el-row>
-    
-    <div class="editor-container" style="margin-top:15px">
-      <json-editor ref="jsonEditor" v-model="taskForm.extra_vars" />
-    </div>
 
-    <el-button type="primary" style="margin-top:10px;" @click.native.prevent="handleSubmit">提交</el-button>
-    <el-checkbox v-model="checked" style="margin-left:30px">提交锁，防止误提交</el-checkbox>
-  </el-form>
-  <el-divider></el-divider>
-  <div>
+      <el-button type="primary" style="margin-top:10px;" @click.native.prevent="handleSubmit">提交</el-button>
+      <el-checkbox v-model="checked" style="margin-left:30px">提交锁，防止误提交</el-checkbox>
+    </el-form>
+    <el-divider />
+    <div>
       <el-button type="success" size="medium" round @click="startSSHTest">测试ssh连接</el-button>
       <el-button type="danger" size="medium" round @click="stopSSHTest">停止测试</el-button>
-      <el-checkbox style="margin-left:30px" v-model="clean">停止时,清空测试记录</el-checkbox>
+      <el-checkbox v-model="clean" style="margin-left:30px">停止时,清空测试记录</el-checkbox>
       <el-card class="ssh-card">
         <div v-for="line, index in testSSHResult" :key="index">
           <p :class="line[1]?'green-class':'red-class'">{{ index + 1 }} <span>{{ line[0] }}</span> 用时{{ line[2] }}秒 &nbsp;&nbsp; {{ line[3] | parseTime('{h}:{i}:{s}') }} </p>
@@ -182,24 +183,24 @@ export default {
     // 设置请求头中的token
     setToken() {
       if (store.getters.token) {
-        return {'X-Token': getToken()}
+        return { 'X-Token': getToken() }
       }
     },
     // 返回文件上传地址
     getURL() {
-      return process.env.VUE_APP_BASE_API + "upload_dist" + "?option=" + this.optName
+      return process.env.VUE_APP_BASE_API + 'upload_dist' + '?option=' + this.optName
     },
     // 上传之前判断文件名
     beforeUpload(file) {
       // 先选择参数才可上传
-      if(!this.optName) {
+      if (!this.optName) {
         this.$message.error('请先选择参数')
         return false
       }
       // 判断文件名后缀是否为.zip
-      let fileArr = file.name.split(".")
-      let suffix = fileArr[fileArr.length - 1]
-      if(suffix != "zip") {
+      const fileArr = file.name.split('.')
+      const suffix = fileArr[fileArr.length - 1]
+      if (suffix != 'zip') {
         this.$message.error('请上传zip文件')
         return false
       }
@@ -210,7 +211,7 @@ export default {
     },
     // 文件超出个数限制时的钩子
     handleExceed(files, fileList) {
-      this.$message.warning("当前限制选择 1 个文件")
+      this.$message.warning('当前限制选择 1 个文件')
     },
     // 上传成功钩子
     handleUploadSuccess(res, file, fileList) {

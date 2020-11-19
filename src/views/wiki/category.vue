@@ -56,7 +56,7 @@
               取消
             </el-button>
             <el-button
-              v-if="!row.edit  && row.name != 'Default'"
+              v-if="!row.edit && row.name != 'Default'"
               type="primary"
               size="small"
               icon="el-icon-edit"
@@ -65,7 +65,7 @@
               编辑
             </el-button>
             <el-button
-              v-if="!row.edit  && row.name != 'Default'"
+              v-if="!row.edit && row.name != 'Default'"
               type="danger"
               size="small"
               icon="el-icon-delete"
@@ -113,12 +113,12 @@ export default {
   },
   computed: {
     ...mapGetters([
-    'categoryList',
-    ]),
+      'categoryList'
+    ])
     // categoryList() {
     //   return this.$store.state.wiki.categoryList.map(v => {
     //     this.$set(v, 'edit', false)
-    //     v.originalName = v.name 
+    //     v.originalName = v.name
     //     return v
     //   })
     // }

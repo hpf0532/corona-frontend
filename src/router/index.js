@@ -86,7 +86,7 @@ export const constantRoutes = [
         name: 'Confirm',
         component: () => import('@/views/auth/confirm'),
         meta: { title: 'confirm', noCache: true }
-      },
+      }
     ]
   },
 
@@ -248,7 +248,7 @@ export const constantRoutes = [
       {
         path: 'posts',
         name: 'WikiContent',
-        redirect: "/wiki/posts/list",
+        redirect: '/wiki/posts/list',
         component: () => import('@/views/wiki/index'),
         // meta: { title: '文章首页' },
         children: [
@@ -285,8 +285,7 @@ export const constantRoutes = [
             component: () => import('@/views/wiki/draft'),
             meta: { title: '编辑草稿' },
             hidden: true
-          },
-
+          }
 
         ]
 
@@ -295,13 +294,13 @@ export const constantRoutes = [
         path: 'mypost',
         component: () => import('@/views/wiki/mypost'),
         name: 'MyPost',
-        meta: { title: '我的文档', icon: 'me' },
+        meta: { title: '我的文档', icon: 'me' }
       },
       {
         path: 'draft-box',
         component: () => import('@/views/wiki/draft-box'),
         name: 'DraftBox',
-        meta: { title: '草稿箱', icon: 'draft' },
+        meta: { title: '草稿箱', icon: 'draft' }
       },
       {
         path: 'category',
@@ -309,7 +308,7 @@ export const constantRoutes = [
         component: () => import('@/views/wiki/category'),
         meta: { title: '文章分类', icon: 'category' }
 
-      },
+      }
     ]
   },
 
@@ -329,7 +328,7 @@ export const constantRoutes = [
         component: () => import('@/views/filerepo/index'),
         meta: { title: '文件管理', icon: 'file' }
         // hidden: true
-      },
+      }
     ]
     // children: [
     //   {
@@ -386,7 +385,7 @@ export const constantRoutes = [
     name: 'InterSystem',
     component: Layout,
     meta: {
-      title: "内部系统",
+      title: '内部系统',
       icon: 'link'
     },
     children: [

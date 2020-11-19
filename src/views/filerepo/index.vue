@@ -3,65 +3,69 @@
     <el-card class="box-card">
       <div slot="header" class="clearfix">
         <span>
-          <el-button 
-              icon="el-icon-s-home"
-              type="text"
-              @click="changeFolder(null)">
-              文件库
+          <el-button
+            icon="el-icon-s-home"
+            type="text"
+            @click="changeFolder(null)"
+          >
+            文件库
           </el-button>
         </span>
         <span v-for="(item, i) in breadcrumbList" :key="item.id">
-          <el-button 
-              icon="el-icon-caret-right"
-              type="text"
-              @click="changeFolder(item.id)">
-              {{ item.name }}
+          <el-button
+            icon="el-icon-caret-right"
+            type="text"
+            @click="changeFolder(item.id)"
+          >
+            {{ item.name }}
           </el-button>&nbsp;
         </span>
         <span v-if="bucket">
-        <el-button
-          size="small"
-          style="float: right; padding:6px 6px; margin-top:8px"
-          icon="el-icon-circle-plus-outline"
-          type="success"
-          @click="handleCreate()"
-        >新建文件夹</el-button>
-        <el-upload
-          class="upload-demo"
-          style="float: right"
-          ref='upload'
-          action=""
-          :before-upload="beforeUpload"
-          :show-file-list="false"
-          :on-change="hanldeChange"
-          :on-remove="handleRemove"
-          :http-request="upLoad"
-          :limit="3"
-          multiple
-          :on-exceed="handleExceed"
-          :file-list="fileList"
+          <el-button
+            size="small"
+            style="float: right; padding:6px 6px; margin-top:8px"
+            icon="el-icon-circle-plus-outline"
+            type="success"
+            @click="handleCreate()"
+          >新建文件夹</el-button>
+          <el-upload
+            ref="upload"
+            class="upload-demo"
+            style="float: right"
+            action=""
+            :before-upload="beforeUpload"
+            :show-file-list="false"
+            :on-change="hanldeChange"
+            :on-remove="handleRemove"
+            :http-request="upLoad"
+            :limit="3"
+            multiple
+            :on-exceed="handleExceed"
+            :file-list="fileList"
           >
-          <el-button 
-            style="padding:6px 6px; margin-top:8px; margin-right:3px"
-            icon="el-icon-upload" 
-            size="small" type="primary">上传文件
-          </el-button>
-        </el-upload>
+            <el-button
+              style="padding:6px 6px; margin-top:8px; margin-right:3px"
+              icon="el-icon-upload"
+              size="small"
+              type="primary"
+            >上传文件
+            </el-button>
+          </el-upload>
         </span>
         <span v-else>
-          <el-button 
+          <el-button
             style="float: right; padding:6px 6px; margin-top:8px; margin-right:3px"
-            icon="el-icon-folder" 
-            size="small" 
+            icon="el-icon-folder"
+            size="small"
             type="primary"
             @click="addBucket"
-            >开通网盘功能
+          >开通网盘功能
           </el-button>
         </span>
       </div>
-      <el-table 
+      <el-table
         v-loading="listLoading"
-        :data="fileData" 
+        :data="fileData"
         style="width: 100%"
         fit
         highlight-current-row
@@ -69,14 +73,14 @@
         <el-table-column prop="filename" label="名称" width="250">
           <template slot-scope="{row}">
             <div v-if="row.file_type == 1">
-              <i class="el-icon-document"></i>
+              <i class="el-icon-document" />
               <span>{{ row.filename }}</span>
             </div>
             <div v-else>
-              <el-button 
-              icon="el-icon-folder"
-              type="text"
-              @click="changeFolder(row.id)"
+              <el-button
+                icon="el-icon-folder"
+                type="text"
+                @click="changeFolder(row.id)"
               >{{ row.filename }}
               </el-button>
             </div>
@@ -104,38 +108,38 @@
           </template>
         </el-table-column>
         <el-table-column
-        label="操作"
-        class-name="small-padding fixed-width"
-      >
-        <template slot-scope="{row,$index}">
-          <!-- @click="handleUpdate(row)" -->
-          <span v-if="row.file_type == 2">
-            <el-button
-              type="primary"
-              size="small"
-              icon="el-icon-edit"
-              @click="handleUpdate(row)"
-            >编辑</el-button>
-          </span>
+          label="操作"
+          class-name="small-padding fixed-width"
+        >
+          <template slot-scope="{row,$index}">
+            <!-- @click="handleUpdate(row)" -->
+            <span v-if="row.file_type == 2">
+              <el-button
+                type="primary"
+                size="small"
+                icon="el-icon-edit"
+                @click="handleUpdate(row)"
+              >编辑</el-button>
+            </span>
 
-          <span v-if="row.file_type == 1">
-            <el-button
-              type="primary"
-              size="small"
-              icon="el-icon-download"
-              @click="handleDownload(row)"
-            >下载</el-button>
-          </span>
+            <span v-if="row.file_type == 1">
+              <el-button
+                type="primary"
+                size="small"
+                icon="el-icon-download"
+                @click="handleDownload(row)"
+              >下载</el-button>
+            </span>
 
-          <el-button
-            type="danger"
-            size="small"
-            icon="el-icon-delete"
-            @click="handleDelete(row, $index)"
-          >删除</el-button>
+            <el-button
+              type="danger"
+              size="small"
+              icon="el-icon-delete"
+              @click="handleDelete(row, $index)"
+            >删除</el-button>
           <!-- <el-button v-if="row.status!='deleted'" size="mini" type="danger">删除</el-button> -->
-        </template>
-      </el-table-column>
+          </template>
+        </el-table-column>
       </el-table>
     </el-card>
 
@@ -143,11 +147,11 @@
       <el-form ref="folderForm" :rules="rules" :model="folderForm">
         <el-form-item label="文件夹名称" :label-width="formLabelWidth" prop="folderName">
           <el-input
-            style="width: 300px"
             v-model="folderForm.folderName"
+            style="width: 300px"
             autocomplete="off"
             placeholder="请输入文件夹名称"
-          ></el-input>
+          />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -158,7 +162,7 @@
 
     <el-card v-if="showProgress" class="progress-card">
       <div slot="header" class="clear">
-        <i class="el-icon-upload2"></i>
+        <i class="el-icon-upload2" />
         <span>上传进度条</span>
         <el-button style="float: right; padding: 3px 0" type="text" @click="closeCard">关闭</el-button>
       </div>
@@ -166,64 +170,63 @@
         <div style="margin-bottom:10px">
           <span>{{ key }}</span>
         </div>
-        
-        <el-progress :text-inside="true" :stroke-width="26" :percentage="val"></el-progress>
-        <br/>
+
+        <el-progress :text-inside="true" :stroke-width="26" :percentage="val" />
+        <br>
       </div>
     </el-card>
   </div>
 </template>
 
 <script>
-import { validFolderExist } from "@/utils/validate"
-import { createBucket, getFileList, addFolder, editFolder, deleteFile, getSTSToken, postFile } from "@/api/file"
+import { validFolderExist } from '@/utils/validate'
+import { createBucket, getFileList, addFolder, editFolder, deleteFile, getSTSToken, postFile } from '@/api/file'
 import { parseTime } from '@/utils'
 import { client } from '@/utils/oss'
 import { convertBytes } from '@/filters'
 
-
 export default {
-  name: "File",
+  name: 'File',
   data() {
     const validateFolder = (rule, value, callback) => {
-      if(!value.trim()){
-        return callback(new Error("文件夹不能为空"));
+      if (!value.trim()) {
+        return callback(new Error('文件夹不能为空'))
       }
       validFolderExist(value, this.fileQuery.folder).then(result => {
         if (result) {
-          return callback(new Error("文件夹已存在"));
+          return callback(new Error('文件夹已存在'))
         } else {
-          callback();
+          callback()
         }
-      });
-    };
+      })
+    }
     return {
       bucket: null,
-      dataObj:{},
-      fileList:[],
-      progressObj:{},
+      dataObj: {},
+      fileList: [],
+      progressObj: {},
       fileData: null,
       listLoading: true,
-      dialogStatus: "",
+      dialogStatus: '',
       showProgress: false,
       dialogFormVisible: false,
       // 导航条
       breadcrumbList: [],
       textMap: {
-        update: "编辑文件夹",
-        create: "新建文件夹"
+        update: '编辑文件夹',
+        create: '新建文件夹'
       },
       folderForm: {
-        folderName: ""
+        folderName: ''
       },
-      formLabelWidth: "120px",
+      formLabelWidth: '120px',
       fileQuery: {
         folder: null
       },
       rules: {
         folderName: [
-          { required: true, message: "文件夹必填", trigger: "blur" },
-          { required: true, validator: validateFolder, trigger: "blur" }
+          { required: true, message: '文件夹必填', trigger: 'blur' },
+          { required: true, validator: validateFolder, trigger: 'blur' }
         ]
       }
     }
@@ -232,20 +235,20 @@ export default {
     this.getFileData()
   },
   methods: {
-    hanldeChange(file, fileList){
+    hanldeChange(file, fileList) {
       // console.log(fileList)
     },
     handleRemove(file, fileList) {
-      console.log(file, fileList);
+      console.log(file, fileList)
     },
     handleExceed(files, fileList) {
-        this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+      this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`)
     },
     beforeUpload(file) {
-        return new Promise((resolve, reject) => {
-        //从后台获取第一步所需的数据
-        //getSTSToken 获取OSS秘钥的接口地址
-        const fileInfo = {"name": file.name, "size": file.size}
+      return new Promise((resolve, reject) => {
+        // 从后台获取第一步所需的数据
+        // getSTSToken 获取OSS秘钥的接口地址
+        const fileInfo = { 'name': file.name, 'size': file.size }
         getSTSToken(fileInfo).then(response => {
           this.dataObj = response
           resolve(true)
@@ -259,20 +262,19 @@ export default {
       this.progressObj = {}
       this.$refs.upload.clearFiles()
       const self = this
-      let files = file.file,
-          // point = files.name.lastIndexOf('.'),
-          // suffix = files.name.substr(point),
-          // fileName = files.name.substr(0, point),
-          date = Date.parse(new Date()),
-          fileNames = `${date}_${files.name}`
+      const files = file.file
+      // point = files.name.lastIndexOf('.'),
+      // suffix = files.name.substr(point),
+      // fileName = files.name.substr(0, point),
+      const date = Date.parse(new Date())
+      const fileNames = `${date}_${files.name}`
 
       console.log(files)
-      
-      
+
       // this.progressObj[files.name] = 0
 
-      //fileNames上传文件的名称
-      //file.file上传文件的内容
+      // fileNames上传文件的名称
+      // file.file上传文件的内容
 
       setTimeout(
         () => {
@@ -285,17 +287,17 @@ export default {
                 self.$forceUpdate()
               }
             }
-          
+
           ).then(result => {
-            //下面是如果对返回结果再进行处理，根据项目需要
-            let etag = result.etag.replace(/\"/g,"")
+            // 下面是如果对返回结果再进行处理，根据项目需要
+            const etag = result.etag.replace(/\"/g, '')
             // console.log(result, etag)
             const file = {
-              "filename": files.name, 
-              "file_size": files.size,
-              "parent_id": this.fileQuery.folder?this.fileQuery.folder:0,
-              "key": fileNames,
-              "etag": etag
+              'filename': files.name,
+              'file_size': files.size,
+              'parent_id': this.fileQuery.folder ? this.fileQuery.folder : 0,
+              'key': fileNames,
+              'etag': etag
             }
 
             // setTimeout(
@@ -312,9 +314,9 @@ export default {
             // )
           }).catch(err => {
             console.log(err)
-            self.$message.error(`文件${files.name}上传失败`);
+            self.$message.error(`文件${files.name}上传失败`)
           })
-        }, Math.round(Math.random()* 2000)
+        }, Math.round(Math.random() * 2000)
       )
 
       // setTimeout(function(){ uploadFile() }, Math.round(Math.random()* 1500))
@@ -327,33 +329,33 @@ export default {
     },
     handleCreate() {
       // this.$refs.folderForm.resetFields();
-      this.dialogStatus = "create";
+      this.dialogStatus = 'create'
       console.log(this.fileQuery)
 
-      this.dialogFormVisible = true;
+      this.dialogFormVisible = true
       this.$nextTick(() => {
-        //重置表单
-        this.$refs["folderForm"].resetFields()
-        this.$refs["folderForm"].clearValidate()
+        // 重置表单
+        this.$refs['folderForm'].resetFields()
+        this.$refs['folderForm'].clearValidate()
       })
     },
     handleUpdate(row) {
       // this.$refs.folderForm.resetFields();
-      this.dialogStatus = "update"
+      this.dialogStatus = 'update'
       this.folderForm.id = row.id // copy obj
       this.folderForm.folderName = row.filename
       this.dialogFormVisible = true
       this.$nextTick(() => {
-        //重置表单
+        // 重置表单
         // this.$refs.folderForm.resetFields()
-        this.$refs["folderForm"].clearValidate()
+        this.$refs['folderForm'].clearValidate()
       })
     },
     handleDelete(row, index) {
-        this.$confirm('文件夹包含的所有文件都会被删除?', '是否确定要删除', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
+      this.$confirm('文件夹包含的所有文件都会被删除?', '是否确定要删除', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
       }).then(() => {
         deleteFile(row.id).then(data => {
           this.fileData.splice(index, 1)
@@ -372,11 +374,11 @@ export default {
       })
     },
     createFolder() {
-      this.$refs["folderForm"].validate(valid => {
+      this.$refs['folderForm'].validate(valid => {
         if (valid) {
-          const formData = { 
-            "name": this.folderForm.folderName.trim(),
-            "folder_id": this.fileQuery.folder?this.fileQuery.folder:0
+          const formData = {
+            'name': this.folderForm.folderName.trim(),
+            'folder_id': this.fileQuery.folder ? this.fileQuery.folder : 0
           }
           addFolder(formData).then((response) => {
             // const { id } = response
@@ -391,18 +393,18 @@ export default {
             })
           })
         } else {
-          console.log("error submit!!");
-          return false;
+          console.log('error submit!!')
+          return false
         }
       })
     },
 
     updateFolder() {
-      this.$refs["folderForm"].validate(valid => {
+      this.$refs['folderForm'].validate(valid => {
         if (valid) {
-          const formData = { 
-            "name": this.folderForm.folderName.trim(),
-            "folder_id": this.fileQuery.folder?this.fileQuery.folder:0
+          const formData = {
+            'name': this.folderForm.folderName.trim(),
+            'folder_id': this.fileQuery.folder ? this.fileQuery.folder : 0
           }
           const { id } = this.folderForm
           editFolder(id, formData).then((response) => {
@@ -419,15 +421,15 @@ export default {
             })
           })
         } else {
-          console.log("error submit!!");
-          return false;
+          console.log('error submit!!')
+          return false
         }
       })
     },
     async getFileData() {
       this.listLoading = true
       // 是否有父级目录
-      let query = this.fileQuery.folder?this.fileQuery:null
+      const query = this.fileQuery.folder ? this.fileQuery : null
       const { items, parent_id, breadcrumb_list, bucket } = await getFileList(query)
       this.breadcrumbList = breadcrumb_list
       this.fileData = items
@@ -441,7 +443,6 @@ export default {
     changeFolder(id) {
       this.fileQuery.folder = id
       this.getFileData()
-
     },
     addBucket() {
       createBucket().then(response => {

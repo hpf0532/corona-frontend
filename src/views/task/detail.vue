@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <!-- <table v-loading="dataLoading" class="table table-bordered text-nowrap"> -->
-    <el-button style="float:right;margin-bottom:5px" type="primary" @click="handleCancel" plain :disabled="cancelled">发错了？点我取消</el-button>
+    <el-button style="float:right;margin-bottom:5px" type="primary" plain :disabled="cancelled" @click="handleCancel">发错了？点我取消</el-button>
     <table v-loading="dataLoading" class="table table-bordered text-nowrap">
       <tbody>
         <tr style="background-color: #3c8dbc80;font-weight: bold;">
@@ -43,13 +43,13 @@
           <td class="t-title">任务进度</td>
           <td class="t-body" style="padding:12px">
             <div v-if="progress">
-              <el-progress 
-                :text-inside="true" 
+              <el-progress
+                :text-inside="true"
                 :stroke-width="26"
                 :style="primary"
                 :status="task_status"
-                :percentage="percentage">
-              </el-progress>
+                :percentage="percentage"
+              />
             </div>
           </td>
         </tr>
@@ -128,7 +128,7 @@ export default {
   },
   destroyed() {
     // 路由改变时清楚timer
-    if(this.timer){
+    if (this.timer) {
       clearInterval(this.timer)
     }
   },
@@ -183,12 +183,12 @@ export default {
       }
     },
     async handleCancel() {
-      const result = await taskCancel({"task_id": this.taskDetail.celery_id})
+      const result = await taskCancel({ 'task_id': this.taskDetail.celery_id })
       this.cancelled = result.cancelled
       this.$message({
         message: result.msg,
         type: 'success'
-      });
+      })
     },
     // 刷新任务数据
     flushResult() {

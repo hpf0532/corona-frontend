@@ -8,7 +8,7 @@
       <el-input v-model="listQuery.name" placeholder="主机名" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-select v-model="listQuery.group" placeholder="主机组" clearable class="filter-item" style="width: 130px">
         <el-option v-for="item in groupList" :key="item.id" :label="item.name" :value="item.id" />
-      </el-select>  
+      </el-select>
       <el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter">
         <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" />
       </el-select>
@@ -277,13 +277,13 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const { id, hostname, group, ip, port } = this.temp
-          if(!group) {
+          if (!group) {
             var createData = {
               hostname: hostname.trim(),
               ip: ip,
               port: port
             }
-          }else{
+          } else {
             var createData = {
               hostname: hostname.trim(),
               group_id: group,
@@ -322,13 +322,13 @@ export default {
           const tempData = Object.assign({}, this.temp)
           const { id, hostname, group, ip, port } = tempData
 
-          if(!group) {
+          if (!group) {
             var editData = {
               hostname: hostname.trim(),
               ip: ip,
               port: port
             }
-          }else{
+          } else {
             var editData = {
               hostname: hostname.trim(),
               group_id: group,

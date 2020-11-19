@@ -36,13 +36,13 @@ const actions = {
   register({ commit }, userInfo) {
     const { username, email, password, capcha, capcha_id } = userInfo
     return new Promise((resolve, reject) => {
-      register({ 
-        email: email.trim(), 
-        username: username.trim(), 
-        password: password, 
-        capcha_id: capcha_id, 
+      register({
+        email: email.trim(),
+        username: username.trim(),
+        password: password,
+        capcha_id: capcha_id,
         capcha: capcha
-       }).then(response => {
+      }).then(response => {
         const data = response
         resolve()
       }).catch(error => {

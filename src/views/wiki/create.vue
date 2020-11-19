@@ -1,6 +1,6 @@
 
 <template>
-  <article-edit :is-edit="false"/>
+  <article-edit :is-edit="false" />
 </template>
 
 <script>

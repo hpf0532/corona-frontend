@@ -107,7 +107,7 @@ export default {
       },
       resetPassRules: {
         email: [
-          { required: true, trigger: 'blur', validator: validateEmail },
+          { required: true, trigger: 'blur', validator: validateEmail }
 
         ],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }],
@@ -130,41 +130,39 @@ export default {
   methods: {
 
     handleResetPass() {
-      
-        const query = this.$route.query
-        this.params = this.$qs.parse(query)
-        this.token = this.params.token
-        if(!this.token) {
-            this.$message({
-                showClose: true,
-                message: '密码重置失败，token缺失',
-                type: 'error'
-            })
-            this.$router.push({path: '/forget-password'})
-            return
-        }
+      const query = this.$route.query
+      this.params = this.$qs.parse(query)
+      this.token = this.params.token
+      if (!this.token) {
+        this.$message({
+          showClose: true,
+          message: '密码重置失败，token缺失',
+          type: 'error'
+        })
+        this.$router.push({ path: '/forget-password' })
+        return
+      }
       this.$refs.resetPassForm.validate(valid => {
         if (valid) {
           this.loading = true
           const { email, password } = this.resetPassForm
-          resetPassword(this.token, {'email': email, 'new_password': password}).then(response => {
+          resetPassword(this.token, { 'email': email, 'new_password': password }).then(response => {
             const data = response
             // console.log(data)
-            if(data.code === 20004 ){
-                this.$message({
-                    showClose: true,
-                    message: data.message,
-                    type: 'success'
-                })
-                this.$router.push({ path: this.redirect || '/login' })
-
-            }else if(data.code === 50002){
-                this.$message({
-                    showClose: true,
-                    message: data.message,
-                    type: 'error'
-                })
-                this.$router.push({ path: '/forget-password' })
+            if (data.code === 20004) {
+              this.$message({
+                showClose: true,
+                message: data.message,
+                type: 'success'
+              })
+              this.$router.push({ path: this.redirect || '/login' })
+            } else if (data.code === 50002) {
+              this.$message({
+                showClose: true,
+                message: data.message,
+                type: 'error'
+              })
+              this.$router.push({ path: '/forget-password' })
             }
             this.loading = false
           }).catch((e) => {
