@@ -20,7 +20,7 @@
     <div class="user-bio">
       <div class="user-education user-bio-section">
         <div class="user-bio-section-header"><svg-icon icon-class="education" /><span>Verify</span></div>
-        <div class="user-bio-section-body">
+        <div class="user-bio-section-body" v-loading="loading">
           <div v-if="isActive" class="text-muted">
             <p style="color:green">邮箱已激活</p>
           </div>
@@ -88,7 +88,8 @@ export default {
       isActive: false,
       content: '点击发送激活邮件',
       totalTime: 60,
-      canClick: true // 添加canClick
+      canClick: true, // 添加canClick
+      loading: true
     }
   },
   created() {
@@ -98,6 +99,7 @@ export default {
     async getState() {
       const data = await getEmailState()
       this.isActive = data.is_active
+      this.loading = false
     },
     // 重新发送确认邮箱邮件
     handleResend() {
