@@ -17,7 +17,7 @@
   "dependencies": {
     "@toast-ui/editor": "^2.1.2",
     "ali-oss": "^6.7.0",
-    "axios": "0.18.1",
+    "axios": "0.21.1",
     "bootstrap": "^4.4.1",
     "codemirror": "^5.52.2",
     "echarts": "^4.6.0",
